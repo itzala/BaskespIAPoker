@@ -11,9 +11,10 @@ public class Combinaison implements Comparable<Combinaison>{
 		this(kind, null);
 	}
 	
-	public Combinaison(String kind, ArrayList<Card> cards)
+	public Combinaison(String kind, ArrayList<Card> c)
 	{
 		setCombinaisonKind(kind);
+		cards.addAll(c);
 	}
 	
 	private void setCombinaisonKind(String kind)
@@ -64,6 +65,11 @@ public class Combinaison implements Comparable<Combinaison>{
 				best_card = card;
 		}
 		return best_card;
+	}
+	
+	public boolean isStrongerThan(Combinaison c)
+	{
+		return c != null && compareTo(c) == 1;
 	}
 	
 	public boolean isValid()

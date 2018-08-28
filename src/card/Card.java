@@ -97,6 +97,11 @@ public class Card implements Comparable<Card>{
 		return this.getColor().ordinal() == c.getColor().ordinal();
 	}
 	
+	public boolean isColorStrongerThan(Card c)
+	{
+		return this.getColor().ordinal() > c.getColor().ordinal();
+	}
+	
 	public boolean isSameCard(Card c)
 	{
 		return (compareTo(c) == 0) && isSameColor(c);
@@ -121,7 +126,21 @@ public class Card implements Comparable<Card>{
 		return this.color.ordinal();
 	}
 
-
+	public boolean isSameValueThan(Card c)
+	{
+		return c != null && compareTo(c) == 0;
+	}
+	
+	public boolean isStrongerThan(Card c)
+	{
+		return c != null && compareTo(c) == 1;
+	}
+	
+	public boolean isWeakerThan(Card c)
+	{
+		return c != null && compareTo(c) == -1;
+	}
+	
 	@Override
 	public int compareTo(Card c) 
 	{
