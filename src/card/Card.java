@@ -5,81 +5,10 @@ public class Card implements Comparable<Card>{
 	private ValueCard value;
 	private ColorCard color;
 	
-	public Card(String value, String color)
+	public Card(ValueCard value, ColorCard color)
 	{
-		setColorCard(color);
-		setValueCard(value);
-	}
-	
-	
-	private void setColorCard(String value)
-	{
-		switch (value.toUpperCase()) {
-		case "SPADE":
-			this.color = ColorCard.SPADE;
-			break;
-		case "HEART":
-			this.color = ColorCard.HEART;
-			break;
-		case "DIAMOND":
-			this.color = ColorCard.DIAMOND;
-			break;
-		case "CLUB":
-			this.color = ColorCard.CLUB;
-			break;
-		default:
-			this.color = ColorCard.NONE;
-			break;
-		}
-	}
-	
-	
-	private void setValueCard(String value)
-	{
-		switch (value.toUpperCase()) {
-		case "1":
-			this.value = ValueCard.AS;
-			break;
-		case "2":
-			this.value = ValueCard.TWO;
-			break;
-		case "3":
-			this.value = ValueCard.THREE;
-			break;
-		case "4":
-			this.value = ValueCard.FOUR;
-			break;
-		case "5":
-			this.value = ValueCard.FIVE;
-			break;
-		case "6":
-			this.value = ValueCard.SIX;
-			break;
-		case "7":
-			this.value = ValueCard.SEVEN;
-			break;
-		case "8":
-			this.value = ValueCard.EIGHT;
-			break;
-		case "9":
-			this.value = ValueCard.NINE;
-			break;
-		case "10":
-			this.value = ValueCard.TEN;
-			break;
-		case "JACK":
-			this.value = ValueCard.JACK;
-			break;
-		case "QUEEN":
-			this.value = ValueCard.QUEEN;
-			break;
-		case "KING":
-			this.value = ValueCard.KING;
-			break;
-		default:
-			this.value = ValueCard.NONE;
-			break;
-		}
+		this.color = color;
+		this.value = value;
 	}
 	
 	public ValueCard getValue()

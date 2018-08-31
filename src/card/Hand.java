@@ -7,10 +7,8 @@ public class Hand {
 	private int current_nb_cards = 0;
 	private Card[] cards_by_value;
 	private Card[] cards_by_color;
-	private Combinaison best_combinaison = new Combinaison("NONE");
-	
-	private static Hand instance = null;
-	
+	private Combinaison best_combinaison = new Combinaison(CombinaisonKind.NONE);
+		
 	private ArrayList<Card> cards_paire = null;	
 	private ArrayList<Card> cards_double_paire = null ; 
 	private ArrayList<Card> cards_brelan = null;
@@ -22,26 +20,17 @@ public class Hand {
 	private ArrayList<Card> cards_quinte_flush_royal = null; 
 	
 	
-	private Hand(){}
-	
-	
-	public static Hand getInstance()
+	public Hand()
 	{
-		if (instance == null )
-		{
-			instance = new Hand();
-			instance.initializeCards();
-		}
-		
-		return instance;
+		initializeCards();
 	}
 	
 	private void initializeCards()
 	{
 		for (int c = 0; c < MAX_NB_CARDS; c++)
 		{
-			cards_by_value[c] = new Card("NONE", "NONE");
-			cards_by_color[c] = new Card("NONE", "NONE");
+			cards_by_value[c] = new Card(ValueCard.NONE, ColorCard.NONE);
+			cards_by_color[c] = new Card(ValueCard.NONE, ColorCard.NONE);;
 		}
 	}
 	
@@ -83,8 +72,7 @@ public class Hand {
 			
 		}
 		current_nb_cards++;
-		
-		
+		calculateCombinaisons();
 		
 		return this;
 	}
@@ -96,9 +84,8 @@ public class Hand {
 		}
 		return this;
 	}
-	
 			
-	private ArrayList<Card> getPaire(int excluded_value, boolean is_double_paire)
+	private ArrayList<Card> calculatePaire(int excluded_value, boolean is_double_paire)
 	{
 		if (current_nb_cards >= 2)
 		{
@@ -130,14 +117,14 @@ public class Hand {
 		return null;
 	}
 	
-	private void getDoublePaire()
+	private void calculateDoublePaire()
 	{
 		if (current_nb_cards >= 4)
 		{
-			getPaire(-1, false);
+			calculatePaire(-1, false);
 			if (cards_paire != null && ! cards_paire.isEmpty())
 			{
-				ArrayList<Card> cards_second_paire = getPaire(cards_paire.get(0).getIntValue(), true);
+				ArrayList<Card> cards_second_paire = calculatePaire(cards_paire.get(0).getIntValue(), true);
 				if (cards_paire != null && ! cards_paire.isEmpty())
 				{
 					cards_double_paire.addAll(cards_paire);
@@ -148,7 +135,7 @@ public class Hand {
 		
 	}
 	
-	private void getBrelan()
+	private void calculateBrelan()
 	{
 		if (current_nb_cards >= 3)
 		{
@@ -183,9 +170,8 @@ public class Hand {
 		}
 		
 	}
-	
-	
-	private void getCarre()
+		
+	private void calculateCarre()
 	{
 		if (current_nb_cards >= 4)
 		{
@@ -230,8 +216,7 @@ public class Hand {
 		
 	}
 	
-	
-	private void getColor()
+	private void calculateColor()
 	{
 		if (current_nb_cards >= 5)
 		{
@@ -260,14 +245,14 @@ public class Hand {
 		
 	}
 	
-	private void getFull()
+	private void calculateFull()
 	{
 		if (current_nb_cards >= 5)
 		{
-			getBrelan();
+			calculateBrelan();
 			if (cards_brelan != null && ! cards_brelan.isEmpty())
 			{
-				getPaire(cards_brelan.get(0).getIntValue(), false);
+				calculatePaire(cards_brelan.get(0).getIntValue(), false);
 				if (cards_paire != null && ! cards_paire.isEmpty())
 				{
 					cards_full.addAll(cards_brelan);
@@ -279,7 +264,7 @@ public class Hand {
 		
 	}
 	
-	private void getQuinte()
+	private void calculateQuinte()
 	{
 		if (current_nb_cards >= 5)
 		{
@@ -309,11 +294,11 @@ public class Hand {
 		
 	}
 	
-	private void getQuinteFlush()
+	private void calculateQuinteFlush()
 	{
 		if (current_nb_cards >= 5)
 		{
-			getQuinte();
+			calculateQuinte();
 			if (cards_quinte != null && ! cards_quinte.isEmpty())
 			{
 				boolean same_color = true;
@@ -333,80 +318,81 @@ public class Hand {
 		
 	}
 	
-	private void getQuinteFlushRoyale()
+	private void calculateQuinteFlushRoyale()
 	{
 		if (current_nb_cards >= 5)
 		{
-			getQuinteFlush();
+			calculateQuinteFlush();
 			if (cards_quinte_flush != null && ! cards_quinte_flush.isEmpty()
-					&& cards_quinte_flush.get(0).isSameValueThan(new Card("AS", "NONE")))
+					&& cards_quinte_flush.get(0).isSameValueThan(new Card(ValueCard.AS, ColorCard.NONE)))
 				cards_quinte_flush_royal = cards_quinte_flush;
 		}
 	}
 		
-	private Card getHighestCard()
+	private Card calcultateHighestCard()
 	{
 		return cards_by_value[current_nb_cards];
 	}
 	
 	public Hand calculateCombinaisons()
 	{
-		getQuinteFlushRoyale();
+		calculateQuinteFlushRoyale();
 		
 		Combinaison new_combinaison = null;
 		
 		if (cards_quinte_flush_royal != null && ! cards_quinte_flush_royal.isEmpty())
 		{
-			new_combinaison = new Combinaison("QUINTE_FLUSH_ROYAL", cards_quinte_flush_royal);
+			new_combinaison = new Combinaison(CombinaisonKind.QUINTE_FLUSH_ROYAL, cards_quinte_flush_royal);
 		}
 		else if (cards_quinte_flush != null && ! cards_quinte_flush.isEmpty())
 		{
-			new_combinaison = new Combinaison("QUINTE_FLUSH", cards_quinte_flush);
+			new_combinaison = new Combinaison(CombinaisonKind.QUINTE_FLUSH, cards_quinte_flush);
 		}
 		else
 		{
-			getCarre();
+			calculateCarre();
 			if (cards_carre != null && ! cards_carre.isEmpty())
 			{
-				new_combinaison = new Combinaison("CARRE", cards_carre);
+				new_combinaison = new Combinaison(CombinaisonKind.CARRE, cards_carre);
 			}
 			else
 			{
-				getFull();
+				calculateFull();
 				if (cards_full != null && ! cards_full.isEmpty())
 				{
-					new_combinaison = new Combinaison("FULL", cards_full);
+					new_combinaison = new Combinaison(CombinaisonKind.FULL, cards_full);
 				}
 				else 
 				{
-					getColor();
+					calculateColor();
 					if (cards_color != null && ! cards_color.isEmpty())
 					{
-						new_combinaison = new Combinaison("COLOR", cards_color);
+						new_combinaison = new Combinaison(CombinaisonKind.COLOR, cards_color);
 					}
 					else if (cards_quinte != null && ! cards_quinte.isEmpty())
 					{
-						new_combinaison = new Combinaison("QUINTE", cards_quinte);
+						new_combinaison = new Combinaison(CombinaisonKind.QUINTE, cards_quinte);
 					}		
 					else if (cards_brelan != null && ! cards_brelan.isEmpty())
 					{
-						new_combinaison = new Combinaison("BRELAN", cards_brelan);
+						new_combinaison = new Combinaison(CombinaisonKind.BRELAN, cards_brelan);
 					}
 					else
 					{
-						getDoublePaire();
+						calculateDoublePaire();
 						if (cards_double_paire != null && ! cards_double_paire.isEmpty())
 						{
-							new_combinaison = new Combinaison("DOUBLE_PAIRE", cards_double_paire);
+							new_combinaison = new Combinaison(CombinaisonKind.DOUBLE_PAIRE, cards_double_paire);
 						}
 						else if (cards_paire != null && ! cards_paire.isEmpty())
 						{
-							new_combinaison = new Combinaison("PAIRE", cards_paire);
+							new_combinaison = new Combinaison(CombinaisonKind.PAIRE, cards_paire);
 						}
 						else
 						{
 							ArrayList<Card> hight_card = new ArrayList<Card>();
-							new_combinaison = new Combinaison("HIGHT_CARD", hight_card.add(getHighestCard()));
+							hight_card.add(calcultateHighestCard());
+							new_combinaison = new Combinaison(CombinaisonKind.HIGHT_CARD, hight_card);
 						}
 					}
 				}
