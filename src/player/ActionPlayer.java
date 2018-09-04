@@ -2,21 +2,18 @@ package player;
 
 public class ActionPlayer {
 	private int value;
-	private ActionKind kind;
 	
-	public ActionPlayer(ActionKind k)
+	public ActionPlayer()
 	{
-		this(k, 0);
+		this(0);
 	}
 	
-	public ActionPlayer(ActionKind k, int v)
+	public ActionPlayer(int v)
 	{
 		if (v < 0)
 			value = 0;
 		else
 			value = v;
-
-		kind = k;
 	}
 	
 	public int getValue()

@@ -1,6 +1,5 @@
 package card;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Combinaison implements Comparable<Combinaison>{
 	private ArrayList<Card> cards;
@@ -15,6 +14,11 @@ public class Combinaison implements Comparable<Combinaison>{
 	{
 		this.kind = kind;
 		cards.addAll(c);
+	}
+	
+	public int getPowerfull()
+	{
+		return this.kind.ordinal();
 	}
 	
 	public Card getBestCard()

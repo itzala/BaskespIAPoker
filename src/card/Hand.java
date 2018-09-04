@@ -19,6 +19,8 @@ public class Hand {
 	private ArrayList<Card> cards_quinte_flush = null; 
 	private ArrayList<Card> cards_quinte_flush_royal = null; 
 	
+	private boolean isWon = false;
+	
 	
 	public Hand()
 	{
@@ -425,5 +427,15 @@ public class Hand {
 	public Combinaison getBestCombinaison()
 	{
 		return best_combinaison;
+	}
+	
+	public void winHand()
+	{
+		this.isWon = true;
+	}
+	
+	public boolean isWonHand()
+	{
+		return this.isWon;
 	}
 }
