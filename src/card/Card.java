@@ -4,11 +4,19 @@ public class Card implements Comparable<Card>{
 	
 	private ValueCard value;
 	private ColorCard color;
+	private int index_card;
+	
 	
 	public Card(ValueCard value, ColorCard color)
 	{
+		this(value, color, -1);
+	}
+	
+	public Card(ValueCard value, ColorCard color, int index_card)
+	{
 		this.color = color;
 		this.value = value;
+		this.index_card = index_card;
 	}
 	
 	public ValueCard getValue()
@@ -21,12 +29,18 @@ public class Card implements Comparable<Card>{
 		return this.color;
 	}
 	
+	public int getIndexCard()
+	{
+		return this.index_card;
+	}
+	
 	public boolean isSameColor(Card c)
 	{
 		return this.getColor().ordinal() == c.getColor().ordinal();
 	}
 	
-	public boolean isColorStrongerThan(Card c)
+	// utilisé pour trier les cartes par couleur
+	public boolean isColorGreaterThan(Card c)
 	{
 		return this.getColor().ordinal() > c.getColor().ordinal();
 	}
@@ -45,7 +59,6 @@ public class Card implements Comparable<Card>{
 	{
 		return ValueCard.values().length;
 	}
-
 
 	public int getIntValue() {
 		return this.value.ordinal();

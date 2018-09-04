@@ -62,7 +62,7 @@ public class Hand {
 			{
 				Card tmp = cards_by_color[i];
 				int j = i - 1;
-				while (j > 0 && cards_by_color[j - 1].isColorStrongerThan(c))
+				while (j > 0 && cards_by_color[j - 1].isColorGreaterThan(c))
 				{
 					cards_by_color[j] = cards_by_color[j - 1];
 					j--;
@@ -268,27 +268,42 @@ public class Hand {
 	{
 		if (current_nb_cards >= 5)
 		{
-			Card card_to_compare = cards_by_value[0];
+			Card card_to_compare = cards_by_value[0];			
 			int i = 1;
-			int nb_cards_quinte = 1;
-			while (i < current_nb_cards - 1 && nb_cards_quinte < 5)
+			int nb_cards_quinte = 0;
+			int next_value_quintable = card_to_compare.getIntValue() +1;
+			int index_last_card = 0;
+			
+			if (card_to_compare.getValue() == ValueCard.TWO 
+				&& cards_by_value[current_nb_cards - 1].getValue() == ValueCard.AS)
+			{
+				cards_quinte.add(cards_by_value[current_nb_cards - 1]);				
+				nb_cards_quinte = 2;
+				index_last_card = current_nb_cards - 1;
+			}
+			else
+			{
+				nb_cards_quinte = 1;
+				index_last_card = current_nb_cards;
+			}
+			
+			cards_quinte.add(card_to_compare);
+			
+			while (i < index_last_card && nb_cards_quinte < 5)
 			{
 				Card compared_card = cards_by_value[i];
-				if (card_to_compare.isSameColor(compared_card))
+								
+				if (compared_card.getIntValue() == next_value_quintable)
 				{
+					next_value_quintable++;
 					nb_cards_quinte++;
-					if (nb_cards_quinte == 5){
-						// On inverse pour pouvoir mieux detecter une quinte flush royale
-						cards_quinte.add(cards_by_value[i]);
-						cards_quinte.add(cards_by_value[i - 1]);
-						cards_quinte.add(cards_by_value[i - 2]);
-						cards_quinte.add(cards_by_value[i - 3]);
-						cards_quinte.add(cards_by_value[i - 4]);
-					}
+					cards_quinte.add(compared_card);
 				}
-				else
-					nb_cards_quinte = 0;
 				i++;
+			}
+			if (nb_cards_quinte != 5)
+			{
+				cards_quinte.clear();
 			}
 		}
 		
@@ -324,7 +339,7 @@ public class Hand {
 		{
 			calculateQuinteFlush();
 			if (cards_quinte_flush != null && ! cards_quinte_flush.isEmpty()
-					&& cards_quinte_flush.get(0).isSameValueThan(new Card(ValueCard.AS, ColorCard.NONE)))
+					&& cards_quinte_flush.get(cards_quinte_flush.size() -1).getValue() == ValueCard.AS)
 				cards_quinte_flush_royal = cards_quinte_flush;
 		}
 	}

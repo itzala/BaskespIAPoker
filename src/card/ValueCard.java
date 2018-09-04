@@ -3,7 +3,8 @@ package card;
 //Valeurs triees par ordre de puissance
 
 public enum ValueCard {
-	NONE, 
+	NONE,
+	ONE,
 	TWO, 
 	THREE, 
 	FOUR, 
