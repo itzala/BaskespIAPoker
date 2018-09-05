@@ -2,9 +2,11 @@ package card;
 import java.util.ArrayList;
 
 public class Combinaison implements Comparable<Combinaison>{
-	private ArrayList<Card> cards;
 	private CombinaisonKind kind;
-	
+	private ArrayList<Card> cards;
+	private Combinaison subcombinaison1;
+	private Combinaison subcombinaison2;
+		
 	public Combinaison(CombinaisonKind kind)
 	{
 		this(kind, null);
@@ -13,7 +15,23 @@ public class Combinaison implements Comparable<Combinaison>{
 	public Combinaison(CombinaisonKind kind, ArrayList<Card> c)
 	{
 		this.kind = kind;
-		cards.addAll(c);
+		if (c != null)
+			cards.addAll(c);
+		else
+			cards = c;
+		subcombinaison1 = null;
+		subcombinaison2 = null;
+	}
+	
+	public Combinaison(CombinaisonKind kind, Combinaison c1, Combinaison c2)
+	{
+		if (c1 != null && c2 != null)
+		{
+			this.kind = kind;
+			subcombinaison1 = c1;
+			subcombinaison2 = c2;
+			cards = null;
+		}
 	}
 	
 	public int getPowerfull()
@@ -23,13 +41,22 @@ public class Combinaison implements Comparable<Combinaison>{
 	
 	public Card getBestCard()
 	{
-		Card best_card = new Card(ValueCard.NONE, ColorCard.NONE);
-		
-		for (Card card : cards) {
-			if (card.compareTo(best_card) >= 0)
-				best_card = card;
+		if (cards != null) // combinaison "atomique" telle que le carre, le brelan, la paire, etc...
+		{
+			Card best_card = new Card(ValueCard.NONE, ColorCard.NONE);
+			for (Card card : cards) {
+				if (card.isStrongerThan(best_card))
+					best_card = card;
+			}
+			return best_card;
 		}
-		return best_card;
+		else // combinaison composée : full ou double paire
+		{
+			if (subcombinaison1.isStrongerThan(subcombinaison2))
+				return subcombinaison1.getBestCard();
+			else
+				return subcombinaison2.getBestCard();
+		}
 	}
 	
 	public boolean isStrongerThan(Combinaison c)
