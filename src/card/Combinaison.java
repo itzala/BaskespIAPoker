@@ -15,8 +15,13 @@ public class Combinaison implements Comparable<Combinaison>{
 	public Combinaison(CombinaisonKind kind, ArrayList<Card> c)
 	{
 		this.kind = kind;
+		
 		if (c != null)
+		{
+			if (cards == null)
+				cards = new ArrayList<Card>();
 			cards.addAll(c);
+		}
 		else
 			cards = c;
 		subcombinaison1 = null;
@@ -68,6 +73,19 @@ public class Combinaison implements Comparable<Combinaison>{
 	{
 		return this.kind != CombinaisonKind.NONE;
 	}
+	
+	public ArrayList<Card> getCards()
+	{
+		if (cards != null)
+			return cards;
+		else
+		{
+			ArrayList<Card> sub_cards = subcombinaison1.getCards(); 
+			sub_cards.addAll(subcombinaison2.getCards());
+			return sub_cards;
+		}
+			
+	}
 
 	@Override
 	public int compareTo(Combinaison c) {
@@ -80,4 +98,25 @@ public class Combinaison implements Comparable<Combinaison>{
 		}
 		return 1;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Combinaison [Type = ");
+		builder.append(kind);
+		builder.append(", Cartes = ");
+		builder.append(cards);
+		if (subcombinaison1 != null && subcombinaison2 != null)
+		{
+			builder.append(", Composee de ");
+			builder.append(subcombinaison1);
+			builder.append(" et de ");
+			builder.append(subcombinaison2);
+		}
+		
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }

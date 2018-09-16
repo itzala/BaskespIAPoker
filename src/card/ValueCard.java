@@ -17,5 +17,5 @@ public enum ValueCard {
 	JACK, 
 	QUEEN, 
 	KING, 
-	AS 
+	AS
 }

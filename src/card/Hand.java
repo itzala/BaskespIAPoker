@@ -1,12 +1,13 @@
 package card;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Hand {
 	private final int MAX_NB_CARDS = 7;
 	private int current_nb_cards = 0;
-	private Card[] cards_by_value;
-	private Card[] cards_by_color;
+	private Card[] cards_by_value = new Card[MAX_NB_CARDS];
+	private Card[] cards_by_color = new Card[MAX_NB_CARDS];
 	private Combinaison best_combinaison = new Combinaison(CombinaisonKind.NONE);
 		
 	private ArrayList<Card> cards_paire = null;	
@@ -37,45 +38,17 @@ public class Hand {
 	}
 	
 	public Hand addCard(Card c)
-	{	
-		if (current_nb_cards == 0)
-		{
-			cards_by_value[0] = c;
-			cards_by_color[0] = c;
-		}
-		else
-		{
-			// On trie les cartes par valeur pour detecter facilement les paires, double paires, brelan
-			// full, carree, suite
-			for (int i = 0; i < current_nb_cards; i++)
-			{
-				Card tmp = cards_by_value[i];
-				int j = i - 1;
-				while (j > 0 && cards_by_value[j - 1].isStrongerThan(c))
-				{
-					cards_by_value[j] = cards_by_value[j - 1];
-					j--;
-				}
-				cards_by_value[j] = tmp;
-			}
-			
-			// On trie les cartes par couleurs pour detecter facilement les couleurs
-			for (int i = 0; i < current_nb_cards; i++)
-			{
-				Card tmp = cards_by_color[i];
-				int j = i - 1;
-				while (j > 0 && cards_by_color[j - 1].isColorGreaterThan(c))
-				{
-					cards_by_color[j] = cards_by_color[j - 1];
-					j--;
-				}
-				cards_by_color[j] = tmp;
-			}
-			
-		}
-		current_nb_cards++;
-		calculateCombinaisons();
-		
+	{
+		System.out.println("##############################################");
+		System.out.println("Carte ajoutee : " + c);
+	    cards_by_value[current_nb_cards] = c;
+	    Arrays.sort(cards_by_value);
+	    System.out.println(Arrays.toString(cards_by_value));
+		System.out.println("----------");
+		cards_by_color[current_nb_cards] = c;
+	    current_nb_cards++;
+	    Arrays.sort(cards_by_color, Card.ColorCardComparator);
+	    System.out.println(Arrays.toString(cards_by_color));
 		return this;
 	}
 	
@@ -173,7 +146,7 @@ public class Hand {
 			{
 				Card compared_card1 = cards_by_value[i];
 				Card compared_card2 = cards_by_value[i-1];
-				Card compared_card3 = cards_by_value[i-1];
+				Card compared_card3 = cards_by_value[i-2];
 				if (compared_card1.isSameValueThan(card_to_compare))
 				{
 					if (compared_card2.isSameValueThan(card_to_compare))
@@ -250,12 +223,23 @@ public class Hand {
 	
 	private void calculateQuinte()
 	{
+		
 		if (current_nb_cards >= 5)
 		{
-			Card card_to_compare = cards_by_value[0];			
-			int i = 1;
+			Card card_to_compare = cards_by_value[current_nb_cards - 1];
 			int nb_cards_quinte = 0;
-			int next_value_quintable = card_to_compare.getIntValue() +1;
+			int index_last_card = -1;
+			int next_quintable_value = card_to_compare.getIntValue() - 1;
+						
+		}
+		
+		
+		/*if (current_nb_cards >= 5)
+		{
+			Card card_to_compare = cards_by_value[current_nb_cards -1];			
+			int i = current_nb_cards - 2;
+			int nb_cards_quinte = 0;
+			int next_value_quintable = card_to_compare.getIntValue() - 1;
 			int index_last_card = 0;
 			
 			if (card_to_compare.getValue() == ValueCard.TWO 
@@ -289,7 +273,7 @@ public class Hand {
 			{
 				cards_quinte.clear();
 			}
-		}
+		}*/
 		
 	}
 	
@@ -425,4 +409,21 @@ public class Hand {
 	{
 		return this.isWon;
 	}
+
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Hand [Nombre de cartes = ");
+		builder.append(current_nb_cards);
+		builder.append("/" + MAX_NB_CARDS + " , \nCartes = ");
+		builder.append(Arrays.toString(cards_by_value));
+		builder.append(",\nMeilleure combinaison = ");
+		builder.append(best_combinaison);
+		builder.append(", isWon=");
+		builder.append(isWon);
+		builder.append("\n]");
+		return builder.toString();
+	}
+	
 }
