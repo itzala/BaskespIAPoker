@@ -1,0 +1,35 @@
+{
+  "id": "server.game.cards",
+  "data": {
+  	"cards": [
+  		{
+		    	"value": "5",
+		  		"color": "HEART"
+		    },
+		    {
+		    	"value": "7",
+		  		"color": "HEART"
+		    },
+		    {
+		    	"value": "3",
+		  		"color": "SPADE"
+		    },
+		    {
+		    	"value": "4",
+		  		"color": "DIAMOND"
+		    },
+		    {
+		    	"value": "4",
+		  		"color": "CLUB"
+		    },
+		    {
+		    	"value": "10",
+		  		"color": "CLUB"
+		    },
+		    {
+		    	"value": "8",
+		  		"color": "HEART"
+		    }
+	  	]
+	}
+}

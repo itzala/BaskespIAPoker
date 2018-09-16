@@ -7,6 +7,7 @@ import player.StatePlayer;
 import java.util.ArrayList;
 
 import card.Card;
+import card.Hand;
 
 public class Game {
 	public static final int NB_MAX_HANDS = 150;
@@ -70,5 +71,10 @@ public class Game {
 	public void betBlind(ActionPlayer action)
 	{
 		ia.betBlind(action.getValue());
+	}
+
+	public Hand getHand() {
+		
+		return ia.getHand();
 	}
 }

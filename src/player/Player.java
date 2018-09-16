@@ -91,13 +91,16 @@ public class Player {
 	public void addNewCard(Card c)
 	{
 		current_hand.addCard(c);
+		System.out.println("Fin d'ajout de la carte");
 	}
 	
 	public Player addCards(ArrayList<Card> list_card)
 	{
 		for (Card c : list_card) {
+			
 			addNewCard(c);
 		}
+		System.out.println("Fin d'ajout de toutes les cartes");
 		return this;
 	}	
 	
@@ -140,5 +143,10 @@ public class Player {
 	public void addCoins(int nbCoins) {
 		this.nb_coins += nbCoins;
 		
+	}
+
+	public Hand getHand() {
+		
+		return current_hand;
 	}
 }
