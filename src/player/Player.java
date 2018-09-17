@@ -91,7 +91,6 @@ public class Player {
 	public void addNewCard(Card c)
 	{
 		current_hand.addCard(c);
-		System.out.println("Fin d'ajout de la carte");
 	}
 	
 	public Player addCards(ArrayList<Card> list_card)
@@ -100,7 +99,6 @@ public class Player {
 			
 			addNewCard(c);
 		}
-		System.out.println("Fin d'ajout de toutes les cartes");
 		return this;
 	}	
 	

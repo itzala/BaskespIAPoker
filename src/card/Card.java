@@ -2,9 +2,11 @@ package card;
 
 import java.util.Comparator;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Card implements Comparable<Card>{
 	
-	private ValueCard value;
+	private @SerializedName("kind") ValueCard value;
 	private ColorCard color;
 	private int index_card;
 	
@@ -100,7 +102,6 @@ public class Card implements Comparable<Card>{
 			
 	@Override
 	public String toString() {
-		//return "[" + value + " of " + color + ", index_card=" + index_card + "]";
 		return "[" + value + " of " + color + "]";
 	}
 

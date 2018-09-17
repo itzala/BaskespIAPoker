@@ -10,15 +10,15 @@ public class Hand {
 	private Card[] cards_by_color = new Card[MAX_NB_CARDS];
 	private Combinaison best_combinaison = new Combinaison(CombinaisonKind.NONE);
 		
-	private ArrayList<Card> cards_paire = null;	
-	private ArrayList<Card> cards_second_paire = null ; 
-	private ArrayList<Card> cards_brelan = null;
-	private ArrayList<Card> cards_quinte = null; 
-	private ArrayList<Card> cards_color = null;
-	private ArrayList<Card> cards_full = null;
-	private ArrayList<Card> cards_carre = null; 
-	private ArrayList<Card> cards_quinte_flush = null; 
-	private ArrayList<Card> cards_quinte_flush_royal = null; 
+	private ArrayList<Card> cards_paire = new ArrayList<Card>();	
+	private ArrayList<Card> cards_second_paire = new ArrayList<Card>();
+	private ArrayList<Card> cards_brelan = new ArrayList<Card>();
+	private ArrayList<Card> cards_quinte = new ArrayList<Card>();
+	private ArrayList<Card> cards_color = new ArrayList<Card>();
+	private ArrayList<Card> cards_full = new ArrayList<Card>();
+	private ArrayList<Card> cards_carre = new ArrayList<Card>();
+	private ArrayList<Card> cards_quinte_flush = new ArrayList<Card>();
+	private ArrayList<Card> cards_quinte_flush_royal = new ArrayList<Card>();
 	
 	private boolean isWon = false;
 	
@@ -39,16 +39,17 @@ public class Hand {
 	
 	public Hand addCard(Card c)
 	{
-		System.out.println("##############################################");
-		System.out.println("Carte ajoutee : " + c);
+		//System.out.println("##############################################");
+		//System.out.println("Carte ajoutee : " + c);
 	    cards_by_value[current_nb_cards] = c;
 	    Arrays.sort(cards_by_value);
-	    System.out.println(Arrays.toString(cards_by_value));
-		System.out.println("----------");
+	    //System.out.println(Arrays.toString(cards_by_value));
+		//System.out.println("----------");
 		cards_by_color[current_nb_cards] = c;
 	    current_nb_cards++;
 	    Arrays.sort(cards_by_color, Card.ColorCardComparator);
-	    System.out.println(Arrays.toString(cards_by_color));
+	    //System.out.println(Arrays.toString(cards_by_color));
+	    calculateCombinaisons();
 		return this;
 	}
 	
@@ -62,6 +63,7 @@ public class Hand {
 			
 	private void calculatePaire(int excluded_value, boolean is_double_paire)
 	{
+		//System.out.println("CalculatePaire with ('" + excluded_value+ "','" + is_double_paire+ "') and "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 2)
 		{
 			Card card_to_compare = cards_by_value[current_nb_cards - 1];
@@ -92,6 +94,7 @@ public class Hand {
 	
 	private void calculateDoublePaire()
 	{
+		//System.out.println("CalculateDoublePaire : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 4)
 		{
 			calculatePaire(-1, false);
@@ -103,6 +106,7 @@ public class Hand {
 	
 	private void calculateBrelan()
 	{
+		//System.out.println("calculateBrelan : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 3)
 		{
 			Card card_to_compare = cards_by_value[current_nb_cards - 1];
@@ -138,6 +142,7 @@ public class Hand {
 		
 	private void calculateCarre()
 	{
+		//System.out.println("calculateCarre : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 4)
 		{
 			Card card_to_compare = cards_by_value[current_nb_cards - 1];
@@ -183,6 +188,7 @@ public class Hand {
 	
 	private void calculateColor()
 	{
+		//System.out.println("calculateColor : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 5)
 		{
 			Card card_to_compare = cards_by_color[0];
@@ -212,6 +218,7 @@ public class Hand {
 	
 	private void calculateFull()
 	{
+		//System.out.println("calculateFull : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 5)
 		{
 			calculateBrelan();
@@ -223,7 +230,7 @@ public class Hand {
 	
 	private void calculateQuinte()
 	{
-		
+		//System.out.println("calculateQuinte : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");	
 		if (current_nb_cards >= 5)
 		{
 			Card card_to_compare = cards_by_value[current_nb_cards - 1];
@@ -279,6 +286,7 @@ public class Hand {
 	
 	private void calculateQuinteFlush()
 	{
+		//System.out.println("calculateQuinteFlush : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 5)
 		{
 			calculateQuinte();
@@ -302,6 +310,7 @@ public class Hand {
 	
 	private void calculateQuinteFlushRoyale()
 	{
+		//System.out.println("calculateQuinteFlushRoyale : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
 		if (current_nb_cards >= 5)
 		{
 			calculateQuinteFlush();
@@ -313,11 +322,12 @@ public class Hand {
 		
 	private Card calcultateHighestCard()
 	{
-		return cards_by_value[current_nb_cards];
+		return cards_by_value[current_nb_cards - 1];
 	}
 	
 	public Hand calculateCombinaisons()
 	{
+		clearAllCombinaisons();
 		calculateQuinteFlushRoyale();
 		
 		Combinaison new_combinaison = null;
@@ -395,6 +405,18 @@ public class Hand {
 		return this;
 	}
 	
+	private void clearAllCombinaisons() {
+		cards_paire.clear();
+		cards_second_paire.clear();
+		cards_brelan.clear();
+		cards_quinte.clear();
+		cards_color.clear();
+		cards_full.clear();
+		cards_carre.clear();
+		cards_quinte_flush.clear();
+		cards_quinte_flush_royal.clear();
+	}
+
 	public Combinaison getBestCombinaison()
 	{
 		return best_combinaison;
@@ -420,7 +442,7 @@ public class Hand {
 		builder.append(Arrays.toString(cards_by_value));
 		builder.append(",\nMeilleure combinaison = ");
 		builder.append(best_combinaison);
-		builder.append(", isWon=");
+		builder.append(",\n isWon=");
 		builder.append(isWon);
 		builder.append("\n]");
 		return builder.toString();

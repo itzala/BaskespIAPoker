@@ -7,6 +7,7 @@ import java.util.Set;
 public class Message {
 	private String id;
 	private Map<String, ArrayList<Map<String, String>>> data;
+	public static String ID_MESSAGE_CARDS="server.game.cards";
 
 	public Message(Map<String, ArrayList<Map<String, String>>> data)
 	{

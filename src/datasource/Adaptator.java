@@ -36,20 +36,31 @@ public class Adaptator {
 		if (reader != null)
 		{
 			Gson gson = new Gson();
-			Message m = gson.fromJson(reader, Message.class);
+			Message[] messages = gson.fromJson(reader, Message[].class);
 			game.startGame(3, "Baskesp");
-			System.out.println(m);			
-			ArrayList<Map<String, String>> json_cards = m.getData().get("cards");
-			DataReader data_reader = new DataReader();
-			data_reader.setData(json_cards);
-			System.out.println("##############################################");
-			System.out.println("Get 'CARDS' => "+ json_cards);
-			System.out.println("##############################################");
-			ArrayList<Card> cards = data_reader.getCards();
-			game.addNewCards(cards);
-			System.out.println("Résultat pour la main => ");
-			System.out.println(game.getHand());
-			
+			for (Message m : messages) {
+				if (m.getId().equals(Message.ID_MESSAGE_CARDS))
+				{
+					System.out.println(m);
+					ArrayList<Map<String, String>> json_cards = m.getData().get(DataReader.DATA_CARDS);
+					DataReader data_reader = new DataReader();
+					data_reader.setData(json_cards);
+					ArrayList<Card> cards = data_reader.getCards();
+					System.out.println("##############################################");
+					System.out.println("Nouvelles cartes => "+ cards.toString());
+					System.out.println("##############################################");
+					game.addNewCards(cards);
+					System.out.println("Résultat pour la main => ");
+					System.out.println(game.getHand());
+				}
+				else
+				{
+					System.out.println("----------------------------------------------");
+					System.out.println("Message '" + m.getId() + "' non géré... => Seul les messages pour les cartes sont gérés pour l'instant...");
+					System.out.println("-----------------------------------------------");
+				}
+					
+			}
 		}
 		
 	}

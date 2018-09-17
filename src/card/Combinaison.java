@@ -102,15 +102,18 @@ public class Combinaison implements Comparable<Combinaison>{
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Combinaison [Type = ");
+		builder.append("[");
 		builder.append(kind);
-		builder.append(", Cartes = ");
-		builder.append(cards);
-		if (subcombinaison1 != null && subcombinaison2 != null)
+		if (subcombinaison1 == null && subcombinaison2 == null)
+		{
+			builder.append(", Cartes = ");
+			builder.append(cards);
+		}
+		else
 		{
 			builder.append(", Composee de ");
 			builder.append(subcombinaison1);
-			builder.append(" et de ");
+			builder.append("\n et de ");
 			builder.append(subcombinaison2);
 		}
 		
