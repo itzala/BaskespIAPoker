@@ -1,21 +1,22 @@
 package card;
 
+import com.google.gson.annotations.SerializedName;
+
 //Valeurs triees par ordre de puissance
 
 public enum ValueCard {
 	NONE,
-	ONE,
-	TWO, 
-	THREE, 
-	FOUR, 
-	FIVE, 
-	SIX, 
-	SEVEN, 
-	EIGHT, 
-	NINE, 
-	TEN, 
+	@SerializedName("2") TWO,
+	@SerializedName("3") THREE,
+	@SerializedName("4") FOUR,
+	@SerializedName("5") FIVE,
+	@SerializedName("6") SIX,
+	@SerializedName("7") SEVEN,
+	@SerializedName("8") EIGHT,
+	@SerializedName("9") NINE,
+	@SerializedName("10") TEN, 
 	JACK, 
 	QUEEN, 
 	KING, 
-	AS
+	@SerializedName("1") AS
 }

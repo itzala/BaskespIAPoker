@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 public class DataReader {
 	private ArrayList<Map<String, String>> data;
 	private Gson parser;
+	public static String DATA_CARDS="cards";
 	
 	public DataReader()
 	{
@@ -41,9 +42,9 @@ public class DataReader {
 		
 		for (Iterator<Map<String, String>> iterator = data.iterator(); iterator.hasNext();) {
 			Map<String, String> data = (Map<String, String>) iterator.next();
-			int index_value = Integer.parseInt(data.get("value"));
+			/*int index_value = Integer.parseInt(data.get("value"));
 			ValueCard value = ValueCard.values()[index_value];
-			data.put("value", value.name());
+			data.put("value", value.name());*/
 			cards.add(parser.fromJson(data.toString(), Card.class));
 		}
 		
