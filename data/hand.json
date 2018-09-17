@@ -1,35 +1,69 @@
+[{
+	"id": "server.game.start",
+  	"data": {
+	    "info": [{
+			  "id": 3,
+			  "name": "Baskesp",
+			  "chips": 1500,
+			  "state": ACTIVE,
+			  "dealer": true
+			}],
+    	"count": [{"nb_players" : "4"}]
+  	}
+},
 {
   "id": "server.game.cards",
   "data": {
   	"cards": [
-  		{
-		    	"value": "5",
-		  		"color": "HEART"
-		    },
-		    {
-		    	"value": "7",
-		  		"color": "HEART"
-		    },
-		    {
-		    	"value": "3",
+  			{
+		    	"kind": "KING",
 		  		"color": "SPADE"
 		    },
 		    {
-		    	"value": "4",
-		  		"color": "DIAMOND"
-		    },
-		    {
-		    	"value": "4",
-		  		"color": "CLUB"
-		    },
-		    {
-		    	"value": "10",
-		  		"color": "CLUB"
-		    },
-		    {
-		    	"value": "8",
+		    	"kind": "4",
 		  		"color": "HEART"
 		    }
 	  	]
 	}
-}
+},
+{
+  "id": "server.game.cards",
+  "data": {
+  	"cards": [
+  			{
+		    	"kind": "KING",
+		  		"color": "CLUB"
+		    },
+		    {
+		    	"kind": "4",
+		  		"color": "CLUB"
+		    },
+		    {
+		    	"kind": "4",
+		  		"color": "SPADE"
+		    }
+		]
+	}
+},
+{
+  "id": "server.game.cards",
+  "data": {
+  	"cards": [
+  			{
+		    	"kind": "KING",
+		  		"color": "HEART"
+		    }
+	  	]
+	}
+},
+{
+  "id": "server.game.cards",
+  "data": {
+  	"cards": [
+  			{
+		    	"kind": "5",
+		  		"color": "SPADE"
+		    }
+	  	]
+	}
+}]
