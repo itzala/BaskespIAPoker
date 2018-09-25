@@ -1,15 +1,21 @@
 [{
 	"id": "server.game.start",
   	"data": {
-	    "info": [{
+	    "info": {
 			  "id": 3,
 			  "name": "Baskesp",
 			  "chips": 1500,
 			  "state": ACTIVE,
 			  "dealer": true
-			}],
-    	"count": [{"nb_players" : "4"}]
+			},
+    	"count": "4"
   	}
+},
+{
+  "id": "game.hand.start",
+  "data": {
+    "players": []
+  }
 },
 {
   "id": "server.game.cards",
@@ -27,7 +33,7 @@
 	}
 },
 {
-  "id": "server.game.cards",
+  "id": "server.game.board.cards",
   "data": {
   	"cards": [
   			{
@@ -46,7 +52,7 @@
 	}
 },
 {
-  "id": "server.game.cards",
+  "id": "server.game.board.cards",
   "data": {
   	"cards": [
   			{
@@ -66,4 +72,7 @@
 		    }
 	  	]
 	}
+},
+{
+  "id": "server.game.play.failure"
 }]
