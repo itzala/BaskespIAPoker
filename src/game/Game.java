@@ -16,9 +16,11 @@ public class Game {
 	private Player ia = null;
 	private int last_bet = 0;
 	
-	public void startGame(int id_player, String name)
+	public void startGame(Player p)
 	{
-		ia = new Player(id_player, name, START_COINS, StatePlayer.ACTIVE);		
+		p.setState(StatePlayer.ACTIVE);
+		p.initialize();
+		ia = p;
 	}
 	
 	public void startHand()
@@ -33,11 +35,11 @@ public class Game {
 		ia.addCards(cards);
 	}
 	
-	public void finishHand(Player winner)
+	public void finishHand(ArrayList<Player> winners)
 	{
-		if (ia.isSameThan(winner))
+		/*if (ia.isSameThan(winners))
 			ia.winHand();
-		ia.addCoins(winner.getNbCoins());
+		ia.addCoins(winners.getNbCoins());*/
 	}
 	
 	public void gameOver()
@@ -76,5 +78,9 @@ public class Game {
 	public Hand getHand() {
 		
 		return ia.getHand();
+	}
+
+	public Player getPlayer() {
+		return ia;
 	}
 }

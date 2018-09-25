@@ -1,18 +1,34 @@
 package datasource;
 
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
+
+import com.google.gson.JsonElement;
 
 public class Message {
 	private String id;
-	private Map<String, ArrayList<Map<String, String>>> data;
-	public static String ID_MESSAGE_CARDS="server.game.cards";
-
-	public Message(Map<String, ArrayList<Map<String, String>>> data)
-	{
-		this.data = data;
-	}
+	private Map<String, JsonElement> data;
+//	private Map<String, Object> data;
+	
+	public static final String ID_MESSAGE_GAME_START	= "server.game.start";
+	public static final String ID_MESSAGE_GAME_CARDS	= "server.game.cards";
+	public static final String ID_MESSAGE_BOARD_CARDS	= "server.game.board.cards";
+	public static final String ID_MESSAGE_HAND_START 	= "game.hand.start";
+	public static final String ID_MESSAGE_HAND_END	 	= "game.hand.end";
+	public static final String ID_MESSAGE_PLAY		 	= "server.game.play";
+	public static final String ID_MESSAGE_FAILURE 		= "server.game.play.failure";
+	public static final String ID_MESSAGE_SUCCESS 		= "server.game.play.success";
+	
+	public static final String DATA_KEY_CARDS			= "cards";
+	public static final String DATA_KEY_PLAYERS			= "players";
+	public static final String DATA_KEY_INFO_PLAYER		= "info";
+	public static final String DATA_KEY_COUNT			= "count";
+	public static final String DATA_KEY_PLAYER_ACTION	= "id";
+	public static final String DATA_KEY_ACTION			= "action";
+	public static final String DATA_KEY_HAND_WINNERS	= "winners";
+	public static final String DATA_KEY_END_WINNER		= "winner";
+	
+	
+	
 	
 	public String getId() {
 		return id;
@@ -22,26 +38,27 @@ public class Message {
 		this.id = id;
 	}
 
-	public Map<String, ArrayList<Map<String, String>>> getData() {
+	public Map<String, JsonElement> getData() {
 		return data;
 	}
 
-	public void setData(Map<String, ArrayList<Map<String, String>>> data) {
+	public void setData(Map<String, JsonElement> data) {
 		this.data = data;
 	}
-	
-	public String getRawData()
-	{
-		return data.toString();
-	}
-	
-	public Set<String> getDifferentPartsOfMessage()
-	{
-		return data.keySet();
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Message [id = " + id + ", data = " + data + "]";
+	}
+	
+	private boolean isReachableData(String data_type)
+	{
+		return this.data.keySet().contains(data_type);
+	}
+
+	public Object getRawData(String data_type) {
+		if (isReachableData(data_type))
+			return data.get(data_type);
+		return "";
 	}
 }

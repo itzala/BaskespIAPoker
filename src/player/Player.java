@@ -2,15 +2,17 @@ package player;
 
 import java.util.ArrayList;
 
+import com.google.gson.annotations.SerializedName;
+
 import card.Card;
 import card.CombinaisonKind;
 import card.Hand;
 import game.Game;
 
-public class Player {
+public class Player implements Comparable<Player>{
 	private int id;
 	private String name;
-	private int nb_coins;
+	private @SerializedName("chips") int nb_coins;
 	private ActionPlayer current_action;
 	private StatePlayer state;
 	private boolean dealer;
@@ -33,6 +35,12 @@ public class Player {
 			this.nb_coins = 0;
 		else
 			this.nb_coins = coins;
+		
+		this.initialize();
+	}
+	
+	public void initialize()
+	{
 		current_action = null;
 		hands = new ArrayList<Hand>();
 		current_hand = new Hand();
@@ -130,7 +138,7 @@ public class Player {
 	
 	public boolean isSameThan(Player other)
 	{
-		return this.id == other.id && this.name.equals(other.name);
+		return this.compareTo(other) == 0;
 	}
 	
 	public void winHand()
@@ -146,5 +154,36 @@ public class Player {
 	public Hand getHand() {
 		
 		return current_hand;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Player [id=");
+		builder.append(id);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", nb_coins=");
+		builder.append(nb_coins);
+		builder.append(", current_action=");
+		builder.append(current_action);
+		builder.append(", state=");
+		builder.append(state);
+		builder.append(", dealer=");
+		builder.append(dealer);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(Player other) {
+		if (this.id == other.id && this.name.equals(other.name))
+			return 0;
+		return 1;
+	}
+
+	public void setState(StatePlayer active) {
+		this.state = active;
+		
 	}
 }

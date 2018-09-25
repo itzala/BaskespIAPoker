@@ -1,33 +1,34 @@
 package datasource;
 
 import card.Card;
-import card.ValueCard;
+import player.Player;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class DataReader {
-	private ArrayList<Map<String, String>> data;
 	private Gson parser;
-	public static String DATA_CARDS="cards";
+	private Message message;
 	
 	public DataReader()
 	{
-		this.data = null;
 		parser = new Gson();
 	}
 	
-	public ArrayList<Map<String, String>> getData() {
-		return data;
+	public void setMessage(Message m)
+	{
+		message = m;
 	}
-
-	public void setData(ArrayList<Map<String, String>> data) {
-		this.data = data;
+	
+	public Message getMessage()
+	{
+		return message;
 	}
-
+	
 	public Gson getParser() {
 		return parser;
 	}
@@ -38,16 +39,33 @@ public class DataReader {
 	
 	public ArrayList<Card> getCards()
 	{
-		ArrayList<Card> cards = new ArrayList<Card>();
-		
-		for (Iterator<Map<String, String>> iterator = data.iterator(); iterator.hasNext();) {
-			Map<String, String> data = (Map<String, String>) iterator.next();
-			/*int index_value = Integer.parseInt(data.get("value"));
-			ValueCard value = ValueCard.values()[index_value];
-			data.put("value", value.name());*/
-			cards.add(parser.fromJson(data.toString(), Card.class));
-		}
+		Type listType = new TypeToken<List<Card>>() {}.getType();
+		ArrayList<Card> cards = parser.fromJson(message.getRawData(Message.DATA_KEY_CARDS).toString(), listType);
 		
 		return cards;
 	}
+	
+	public ArrayList<Player> getPlayers()
+	{
+		Type listType = new TypeToken<List<Player>>() {}.getType();
+		ArrayList<Player> players = parser.fromJson(message.getRawData(Message.DATA_KEY_PLAYERS).toString(), listType);
+		
+		return players;
+	}
+	
+	public Player getPlayer()
+	{
+		Player current_player = parser.fromJson(message.getRawData(Message.DATA_KEY_INFO_PLAYER).toString(), Player.class);
+		if (current_player == null)
+			System.out.println("[WARNING] Pas de joueur accessible !");
+		
+		return current_player;
+	}
+
+	public ArrayList<Player> getWinners() {
+		Type listType = new TypeToken<List<Player>>() {}.getType();
+		ArrayList<Player> players = parser.fromJson(message.getRawData(Message.DATA_KEY_HAND_WINNERS).toString(), listType);
+		
+		return players;	}
+	
 }
