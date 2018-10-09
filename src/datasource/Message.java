@@ -17,6 +17,8 @@ public class Message {
 	public static final String ID_MESSAGE_PLAY		 	= "server.game.play";
 	public static final String ID_MESSAGE_FAILURE 		= "server.game.play.failure";
 	public static final String ID_MESSAGE_SUCCESS 		= "server.game.play.success";
+	public static final String ID_MESSAGE_CLIENT_ACTION	= "client.game.action";
+	public static final String ID_MESSAGE_JOIN_LOBBY	= "client.lobby.join";
 	
 	public static final String DATA_KEY_CARDS			= "cards";
 	public static final String DATA_KEY_PLAYERS			= "players";
@@ -26,6 +28,7 @@ public class Message {
 	public static final String DATA_KEY_ACTION			= "action";
 	public static final String DATA_KEY_HAND_WINNERS	= "winners";
 	public static final String DATA_KEY_END_WINNER		= "winner";
+	public static final String DATA_KEY_NAME_TEAM		= "name";
 	
 	
 	

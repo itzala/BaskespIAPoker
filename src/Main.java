@@ -7,8 +7,12 @@ public class Main {
 		
 	Game game = new Game();
 	Adaptator adaptator = new Adaptator(game);
-	adaptator.parseData();
+	adaptator.connect();
+	
+	adaptator.listen();
+	
 	adaptator.release();
+	
 	}
 
 }
