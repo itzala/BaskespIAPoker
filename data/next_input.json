@@ -1,10 +1,5 @@
-[{
-  "id": "server.lobby.join.success"
-}]
-
-[{
-  "id": "server.lobby.join.failure",
-  "data": {
-    "reason": "Nom d'equipe deja pris...."
-  }
-}]
+[
+{
+  "id": "server.game.play.success"
+}
+]

@@ -1,4 +1,13 @@
-[{
+{
+  "id": "server.lobby.join.success"
+}
+{
+  "id": "server.lobby.join.failure",
+  "data": {
+    "reason": "Nom d'equipe deja pris...."
+  }
+}
+{
 	"id": "server.game.start",
   	"data": {
 	    "info": {
@@ -8,15 +17,29 @@
 			  "state": ACTIVE,
 			  "dealer": true
 			},
-    	"count": "4"
+    	"count": "2"
   	}
-},
+}
 {
-  "id": "game.hand.start",
+  "id": "server.game.hand.start",
   "data": {
-    "players": []
+    "players": [
+    		{
+			  "id": 3,
+			  "name": "Baskesp",
+			  "chips": 1500,
+			  "state": ACTIVE,
+			  "dealer": true
+			},
+			{
+			  "id": 4,
+			  "name": "DEV Team",
+			  "chips": 1500,
+			  "state": ACTIVE,
+			  "dealer": true
+			}]
   }
-},
+}
 {
   "id": "server.game.cards",
   "data": {
@@ -31,7 +54,7 @@
 		    }
 	  	]
 	}
-},
+}
 {
   "id": "server.game.board.cards",
   "data": {
@@ -50,29 +73,40 @@
 		    }
 		]
 	}
-},
+}
 {
-  "id": "server.game.board.cards",
-  "data": {
-  	"cards": [
-  			{
-		    	"kind": "KING",
-		  		"color": "HEART"
-		    }
-	  	]
-	}
-},
+  "id": "server.game.play"
+}
 {
-  "id": "server.game.cards",
+  "id": "server.player.action",
   "data": {
-  	"cards": [
-  			{
-		    	"kind": "5",
-		  		"color": "SPADE"
-		    }
-	  	]
+    "id": 4,
+    "action":{
+  		"value": 500
 	}
-},
+  }
+}
+{
+  "id": "server.game.play.timeout"
+}
 {
   "id": "server.game.play.failure"
-}]
+}
+{
+  "id": "server.game.hand.end",
+  "data": {
+    "winners": [{
+			  "id": 3,
+			  "name": "Baskesp",
+			  "chips": 1500,
+			  "state": ACTIVE,
+			  "dealer": true
+			}]
+  }
+}
+{
+  "id": "server.game.play.success"
+}
+{
+  "id": "server.game.end"
+}
