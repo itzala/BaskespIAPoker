@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 import card.Card;
 import constantes.Constantes;
@@ -37,15 +38,21 @@ public class Adaptator {
 	public void connect()
 	{
 		try {
-			System.out.println("Connexion au serveur : " + Constantes.SERVER_ADDRESS + ":"  + Constantes.SERVER_PORT);
+			this.log("Connexion au serveur : " + Constantes.SERVER_ADDRESS + ":"  + Constantes.SERVER_PORT);
 			client_socket = new Socket(Constantes.SERVER_ADDRESS, Constantes.SERVER_PORT);
 			reader = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
 			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client_socket.getOutputStream())), true);
+			JsonElement data_message = new JsonPrimitive(Constantes.PLAYER_NAME);
+			this.sendResponse(Message.ID_MESSAGE_JOIN_LOBBY, data_message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private void log(String message)
+	{
+		System.out.println("[ CLIENT ] " + message);
+	}
 
 	public void listen()
 	{
@@ -56,53 +63,72 @@ public class Adaptator {
 				
 				while ((received_data = reader.readLine()) != null) 
 				{
-					System.out.println(received_data);
-					
 					Message m = gson.fromJson(received_data, Message.class);
 					DataReader data_reader = new DataReader();
 					data_reader.setMessage(m);
-					System.out.println("----------------------------------------------");
+					this.log("----------------------------------------------");
 					switch (m.getId()) {
-						case Message.ID_MESSAGE_GAME_CARDS:
-						case Message.ID_MESSAGE_BOARD_CARDS:
-							ArrayList<Card> cards = data_reader.getCards();
-							System.out.println("##############################################");
-							System.out.println("Nouvelles cartes => "+ cards.toString());
-							System.out.println("##############################################");
-							game.addNewCards(cards);
-							System.out.println("Résultat pour la main => ");
-							System.out.println(game.getHand());
-							break;
-						case Message.ID_MESSAGE_GAME_START:
+						case Message.ID_MESSAGE_GAME_START :
 							Player p = data_reader.getPlayer();
-							game.startGame(p);
-							System.out.println("Info player : " + game.getPlayer());
+							int nb_rivals = data_reader.getNbRivals();
+							game.startGame(p, nb_rivals);
+							this.log("Info player : " + game.getPlayer());
 							break;
-						case Message.ID_MESSAGE_HAND_START:
-							System.out.println("Début d'une nouvelle main !!");
-							game.startHand();
+						case Message.ID_MESSAGE_GAME_END :
+							Player winner = data_reader.getFinalWinner();
+							game.checkWinner(winner);
 							break;
-						case Message.ID_MESSAGE_HAND_END:
-							ArrayList<Player> winners = data_reader.getWinners();
+						case Message.ID_MESSAGE_GAME_CARDS : 
+						case Message.ID_MESSAGE_BOARD_CARDS :
+							ArrayList<Card> cards = data_reader.getCards();
+							this.log("##############################################");
+							this.log("Nouvelles cartes => "+ cards.toString());
+							this.log("##############################################");
+							game.addNewCards(cards);
+							this.log("Résultat pour la main => ");
+							this.log(game.getHand().toString());
+							break;
+						case Message.ID_MESSAGE_LOBBY_SUCCESS :
+							this.log("Lobby rejoint avec success !");
+							break;
+						case Message.ID_MESSAGE_LOBBY_FAILURE	:
+							this.log("Echec lors de la connexion au lobby. Raison évoquée : " + data_reader.getReasonOfFailJoinLobby());
+							break;
+						case Message.ID_MESSAGE_PLAY :
+							ActionPlayer action = game.doAction();
+							this.log("A vous de jouer !");
+							break;
+						case Message.ID_MESSAGE_FAILURE :
+							this.log("Coup invalide... Retentez votre coup");
+							break;
+						case Message.ID_MESSAGE_SUCCESS :
+							this.log("Coup valide donc pris en compte !");
+							game.validateAction();
+							break;
+						case Message.ID_MESSAGE_PLAYER_ACTION :
+							ActionPlayer action_other = data_reader.getAction();
+							int id_player = data_reader.getIdPlayerAction();
+							game.addActionOtherPlayer(id_player, action_other);
+							break;
+						case Message.ID_MESSAGE_HAND_START :
+							this.log("Début d'une nouvelle main !!");
+							Player[] players_hand = data_reader.getPlayers();
+							game.startHand(players_hand);
+							break;
+						case Message.ID_MESSAGE_HAND_END :
+							Player[] winners = data_reader.getWinners();
 							game.finishHand(winners);
 							break;
-						case Message.ID_MESSAGE_PLAY:
-	//						ActionPlayer action = game.doAction();
-							
-							break;
-						case Message.ID_MESSAGE_SUCCESS:
-							System.out.println("Coup valide donc pris en compte !");
-							break;
-						case Message.ID_MESSAGE_FAILURE:
-							System.out.println("Coup invalide... Retentez votre coup");
+						case Message.ID_MESSAGE_PLAY_TIMEOUT :
+							game.abortPlayOnTimeout();
 							break;
 						default:
-							System.out.println("Message '" + m.getId() + "' non géré...");
-							System.out.println(m.getData());
+							this.log("Message '" + m.getId() + "' non géré...");
 							break;
 					}
-					System.out.println("----------------------------------------------");
+					this.log("----------------------------------------------");
 				}
+				this.log("Deconnexion du serveur...");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -123,12 +149,14 @@ public class Adaptator {
 				break;
 		}
 		m.setData(data);
+		this.log("Envoi de " + m);
 		writer.println(gson.toJson(m));
 	}
 
 	public void release()
 	{
 		try {
+			this.log("Fermeture des flux.... avant arrêt du client");
 			reader.close();
 			client_socket.close();
 		} catch (IOException e) {

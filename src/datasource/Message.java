@@ -12,13 +12,19 @@ public class Message {
 	public static final String ID_MESSAGE_GAME_START	= "server.game.start";
 	public static final String ID_MESSAGE_GAME_CARDS	= "server.game.cards";
 	public static final String ID_MESSAGE_BOARD_CARDS	= "server.game.board.cards";
-	public static final String ID_MESSAGE_HAND_START 	= "game.hand.start";
-	public static final String ID_MESSAGE_HAND_END	 	= "game.hand.end";
+	public static final String ID_MESSAGE_LOBBY_SUCCESS	= "server.lobby.join.success";
+	public static final String ID_MESSAGE_LOBBY_FAILURE	= "server.lobby.join.failure";
 	public static final String ID_MESSAGE_PLAY		 	= "server.game.play";
 	public static final String ID_MESSAGE_FAILURE 		= "server.game.play.failure";
 	public static final String ID_MESSAGE_SUCCESS 		= "server.game.play.success";
+	public static final String ID_MESSAGE_GAME_END 		= "server.game.end";
+	public static final String ID_MESSAGE_PLAYER_ACTION	= "server.player.action";
 	public static final String ID_MESSAGE_CLIENT_ACTION	= "client.game.action";
 	public static final String ID_MESSAGE_JOIN_LOBBY	= "client.lobby.join";
+	public static final String ID_MESSAGE_PLAY_TIMEOUT	= "server.game.play.timeout";
+	public static final String ID_MESSAGE_HAND_START 	= "server.game.hand.start";
+	public static final String ID_MESSAGE_HAND_END	 	= "server.game.hand.end";
+	
 	
 	public static final String DATA_KEY_CARDS			= "cards";
 	public static final String DATA_KEY_PLAYERS			= "players";
@@ -29,9 +35,8 @@ public class Message {
 	public static final String DATA_KEY_HAND_WINNERS	= "winners";
 	public static final String DATA_KEY_END_WINNER		= "winner";
 	public static final String DATA_KEY_NAME_TEAM		= "name";
-	
-	
-	
+	public static final String DATA_KEY_REASON 			= "reason";
+		
 	
 	public String getId() {
 		return id;

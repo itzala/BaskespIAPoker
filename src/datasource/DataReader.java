@@ -1,6 +1,7 @@
 package datasource;
 
 import card.Card;
+import player.ActionPlayer;
 import player.Player;
 
 import java.lang.reflect.Type;
@@ -45,10 +46,9 @@ public class DataReader {
 		return cards;
 	}
 	
-	public ArrayList<Player> getPlayers()
+	public Player[] getPlayers()
 	{
-		Type listType = new TypeToken<List<Player>>() {}.getType();
-		ArrayList<Player> players = parser.fromJson(message.getRawData(Message.DATA_KEY_PLAYERS).toString(), listType);
+		Player[] players = parser.fromJson(message.getRawData(Message.DATA_KEY_PLAYERS).toString(), Player[].class);
 		
 		return players;
 	}
@@ -62,10 +62,35 @@ public class DataReader {
 		return current_player;
 	}
 
-	public ArrayList<Player> getWinners() {
-		Type listType = new TypeToken<List<Player>>() {}.getType();
-		ArrayList<Player> players = parser.fromJson(message.getRawData(Message.DATA_KEY_HAND_WINNERS).toString(), listType);
+	public Player[] getWinners() {
+		Player[] players = parser.fromJson(message.getRawData(Message.DATA_KEY_HAND_WINNERS).toString(), Player[].class);
 		
-		return players;	}
+		return players;	
+	}
 	
+	public Player getFinalWinner()
+	{
+		Player winner = parser.fromJson(message.getRawData(Message.DATA_KEY_END_WINNER).toString(), Player.class);
+		return winner;
+	}
+
+	public String getReasonOfFailJoinLobby() {
+		String reason = parser.fromJson(message.getRawData(Message.DATA_KEY_REASON).toString(), String.class);
+		return reason;
+	}
+
+	public ActionPlayer getAction() {
+		ActionPlayer action = parser.fromJson(message.getRawData(Message.DATA_KEY_ACTION).toString(), ActionPlayer.class);
+		return action;
+	}
+
+	public int getIdPlayerAction() {
+		int id_player = parser.fromJson(message.getRawData(Message.DATA_KEY_PLAYER_ACTION).toString(), Integer.class);
+		return id_player;
+	}
+
+	public int getNbRivals() {
+		int nb_rivals = parser.fromJson(message.getRawData(Message.DATA_KEY_COUNT).toString(), Integer.class);
+		return nb_rivals - 1;
+	}	
 }

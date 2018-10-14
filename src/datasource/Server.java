@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -28,6 +29,7 @@ public class Server {
 	private JsonReader reader;
 	private PrintWriter writer;
 	private BufferedReader socket_reader;
+	private boolean shutdown = false;
 	
 	public Server(int port)
 	{
@@ -45,14 +47,32 @@ public class Server {
 		}
 	}
 	
+	public boolean isShutdown()
+	{
+		return shutdown;
+	}
+	
 	public void parseInputFile()
 	{
 		try{
-		Message[] messages = parser.fromJson(reader, Message[].class);
-		for (Message m : messages) {
-			System.out.println("Envoi du message : " + m );
-			this.send(m);
-		}
+			Message[] messages = parser.fromJson(reader, Message[].class);
+			if (messages != null && messages.length > 0)
+			{
+				for (Message m : messages) {
+					System.out.println("Envoi du message : " + m );
+					this.send(m);
+					switch (m.getId()) {
+					case Message.ID_MESSAGE_GAME_END:
+						shutdown = true;
+						System.out.println("Fin de jeu.... déconnexion du serveur.....");
+						break;
+					}
+				}
+			}
+			else
+			{
+				System.out.println("Pas de données à traiter....");
+			}
 		}
 		catch(JsonSyntaxException mfs)
 		{
@@ -83,32 +103,63 @@ public class Server {
 			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s_client.getOutputStream())), true);
 			socket_reader = new BufferedReader(new InputStreamReader(s_client.getInputStream()));
 			
-			parseInputFile();
 			
-		} catch (IOException e) {
+			String received_data = "";
+			
+			while (! s_client.isClosed() && (received_data = socket_reader.readLine()) != null) 
+			{
+				Message m = parser.fromJson(received_data, Message.class);
+				DataReader data_reader = new DataReader();
+				data_reader.setMessage(m);
+				System.out.println("----------------------------------------------");
+				switch (m.getId()) {
+					case Message.ID_MESSAGE_JOIN_LOBBY:
+						System.out.println("L'équipe " + m.getData().get(Message.DATA_KEY_NAME_TEAM) + " a rejoint le lobby" );
+					break;
+					case Message.ID_MESSAGE_CLIENT_ACTION:
+						System.out.println("Le player a joue " + m.getData().get(Message.DATA_KEY_ACTION));
+					break;
+					default:
+						System.out.println("Message '" + m.getId() + "' non géré...");
+						System.out.println(m.getData());
+					break;
+				}
+			}
+			
+		}
+		catch (SocketException e) {			
+			System.out.println("Client déconnecté !");
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 		
 	public void send(Message m)
 	{
-		String message_socket = parser.toJson(m);
-		writer.println(message_socket);
-		writer.flush();
+		if (writer !=  null)
+		{
+			String message_socket = parser.toJson(m);
+			writer.println(message_socket);
+			writer.flush();
+		}
+		else
+		{
+			System.out.println("Pas de connexion !");
+		}
 	}
 	
 	public void disconnect()
 	{
-		writer.close();
-		
 		try {
-			socket_reader.close();
+			System.out.println("Fermeture des flux.....");
+			writer.close();
+			//socket_reader.close();
 			s_client.close();
 			server.close();
 			reader.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
