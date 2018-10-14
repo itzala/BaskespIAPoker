@@ -47,6 +47,11 @@ public class Player implements Comparable<Player>{
 		actions = new ArrayList<ActionPlayer>();
 	}
 	
+	public int getId()
+	{
+		return this.id;
+	}
+	
 	private int getPowerOfHand(int nb_hand, int last_bet)
 	{
 		int ratio_hands = (int) (nb_hand * 100 / Game.NB_MAX_HANDS);
@@ -91,9 +96,16 @@ public class Player implements Comparable<Player>{
 	
 	public void validateAction()
 	{
-		this.nb_coins -= this.current_action.getValue();
-		actions.add(current_action);
-		current_action = null;
+		if (current_action != null)
+		{
+			this.nb_coins -= this.current_action.getValue();
+			actions.add(current_action);
+			current_action = null;
+		}
+		else
+		{
+			System.out.println("Pas d'action courrante d'enregistrée.... ");
+		}
 	}
 	
 	public void addNewCard(Card c)
@@ -184,6 +196,17 @@ public class Player implements Comparable<Player>{
 
 	public void setState(StatePlayer active) {
 		this.state = active;
+		
+	}
+
+	public void addRivalAction(ActionPlayer action_other) {
+		this.actions.add(action_other);
+	}
+
+	public void updateInfoFrom(Player other) {
+		this.state = other.state;
+		this.dealer = other.dealer;
+		this.nb_coins = other.nb_coins;
 		
 	}
 }
