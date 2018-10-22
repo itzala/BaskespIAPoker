@@ -20,7 +20,7 @@ public class Hand {
 	private ArrayList<Card> cards_quinte_flush = new ArrayList<Card>();
 	private ArrayList<Card> cards_quinte_flush_royal = new ArrayList<Card>();
 	
-	private boolean isWon = false;
+	private int coins_variation = 0;
 	
 	
 	public Hand()
@@ -422,14 +422,14 @@ public class Hand {
 		return best_combinaison;
 	}
 	
-	public void winHand()
+	public void setCoinsVariation(int variation)
 	{
-		this.isWon = true;
+		this.coins_variation = variation;
 	}
 	
 	public boolean isWonHand()
 	{
-		return this.isWon;
+		return this.coins_variation > 0;
 	}
 
 	
@@ -442,8 +442,8 @@ public class Hand {
 		builder.append(Arrays.toString(cards_by_value));
 		builder.append(",\nMeilleure combinaison = ");
 		builder.append(best_combinaison);
-		builder.append(",\n isWon=");
-		builder.append(isWon);
+		builder.append(",\n Variation des jetons =");
+		builder.append(coins_variation);
 		builder.append("\n]");
 		return builder.toString();
 	}

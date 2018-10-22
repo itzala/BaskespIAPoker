@@ -74,9 +74,7 @@
 		]
 	}
 }
-{
-  "id": "server.game.play"
-}
+
 {
   "id": "server.player.action",
   "data": {
@@ -86,12 +84,7 @@
 	}
   }
 }
-{
-  "id": "server.game.play.timeout"
-}
-{
-  "id": "server.game.play.failure"
-}
+
 {
   "id": "server.game.hand.end",
   "data": {
@@ -105,7 +98,16 @@
   }
 }
 {
+  "id": "server.game.play"
+}
+{
   "id": "server.game.play.success"
+}
+{
+  "id": "server.game.play.timeout"
+}
+{
+  "id": "server.game.play.failure"
 }
 {
   "id": "server.game.end"

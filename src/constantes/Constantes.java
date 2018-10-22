@@ -10,4 +10,6 @@ public interface Constantes {
 	public final String OUTPUT_CLIENT		= System.getProperty("user.dir") + "/log/client.out";
 	
 	public final String PLAYER_NAME			= "Baskesp";
+	
+	public final int TIME_BEFORE_TIMEOUT 	= 15;	// temps en secondes
 }

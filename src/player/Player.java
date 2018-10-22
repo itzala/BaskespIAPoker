@@ -18,7 +18,8 @@ public class Player implements Comparable<Player>{
 	private boolean dealer;
 	private ArrayList<Hand> hands;
 	private Hand current_hand;
-	private ArrayList<ActionPlayer> actions;	
+	private ArrayList<ActionPlayer> actions;
+	private int nb_coins_begin_hand = 0;
 	
 	public Player(int id_player, String name, int coins, StatePlayer state_player)
 	{
@@ -66,7 +67,7 @@ public class Player implements Comparable<Player>{
 		
 	public ActionPlayer doAction(int nb_hand, int last_bet)
 	{
-		int power_hand = this.getPowerOfHand(nb_hand, last_bet);
+		/*int power_hand = this.getPowerOfHand(nb_hand, last_bet);
 		
 		if (power_hand >= 80) // notre main est suffisament forte, on relance 
 		{
@@ -85,13 +86,12 @@ public class Player implements Comparable<Player>{
 			current_action = new ActionPlayer();
 		}
 				
+		return current_action;*/
+		
+		
+		
+		
 		return current_action;
-	}
-	
-	public void betBlind(int blind)
-	{
-		current_action = new ActionPlayer(blind);
-		validateAction();
 	}
 	
 	public void validateAction()
@@ -106,6 +106,12 @@ public class Player implements Comparable<Player>{
 		{
 			System.out.println("Pas d'action courrante d'enregistrée.... ");
 		}
+	}
+	
+	public void updateCoinsAfterAction(ActionPlayer action)
+	{
+		this.current_action = action;
+		this.validateAction();
 	}
 	
 	public void addNewCard(Card c)
@@ -146,6 +152,7 @@ public class Player implements Comparable<Player>{
 	{
 		hands.add(current_hand);
 		current_hand = new Hand();
+		this.nb_coins_begin_hand = this.nb_coins;
 	}
 	
 	public boolean isSameThan(Player other)
@@ -153,16 +160,11 @@ public class Player implements Comparable<Player>{
 		return this.compareTo(other) == 0;
 	}
 	
-	public void winHand()
+	public void uptdateVariationCoinsEndHand(int nb_coins_end_hand)
 	{
-		current_hand.winHand();
+		current_hand.setCoinsVariation(nb_coins_end_hand - nb_coins_begin_hand);
 	}
-
-	public void addCoins(int nbCoins) {
-		this.nb_coins += nbCoins;
-		
-	}
-
+	
 	public Hand getHand() {
 		
 		return current_hand;
@@ -198,11 +200,7 @@ public class Player implements Comparable<Player>{
 		this.state = active;
 		
 	}
-
-	public void addRivalAction(ActionPlayer action_other) {
-		this.actions.add(action_other);
-	}
-
+	
 	public void updateInfoFrom(Player other) {
 		this.state = other.state;
 		this.dealer = other.dealer;
