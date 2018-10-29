@@ -6,6 +6,7 @@ import player.Player;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -79,11 +80,6 @@ public class DataReader {
 		return reason;
 	}
 
-	public ActionPlayer getAction() {
-		ActionPlayer action = parser.fromJson(message.getRawData(Message.DATA_KEY_ACTION).toString(), ActionPlayer.class);
-		return action;
-	}
-
 	public int getIdPlayerAction() {
 		int id_player = parser.fromJson(message.getRawData(Message.DATA_KEY_PLAYER_ACTION).toString(), Integer.class);
 		return id_player;
@@ -92,5 +88,20 @@ public class DataReader {
 	public int getNbRivals() {
 		int nb_rivals = parser.fromJson(message.getRawData(Message.DATA_KEY_COUNT).toString(), Integer.class);
 		return nb_rivals - 1;
-	}	
+	}
+
+	public int getBetValue() {
+		int id_player = parser.fromJson(message.getRawData(Message.DATA_KEY_VALUE).toString(), Integer.class);
+		return id_player;
+	}
+	
+	public HashMap<String, Integer> getBlindAmount()
+	{
+		HashMap<String, Integer> blinds = new HashMap<String, Integer>();
+		
+		blinds.put(Message.DATA_KEY_BIG_BLIND, parser.fromJson(message.getRawData(Message.DATA_KEY_BIG_BLIND).toString(), Integer.class));
+		blinds.put(Message.DATA_KEY_SMALL_BLIND, parser.fromJson(message.getRawData(Message.DATA_KEY_SMALL_BLIND).toString(), Integer.class));
+		
+		return blinds;
+	}
 }

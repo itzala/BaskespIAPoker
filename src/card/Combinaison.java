@@ -41,7 +41,10 @@ public class Combinaison implements Comparable<Combinaison>{
 	
 	public int getPowerfull()
 	{
-		return this.kind.ordinal();
+		if (subcombinaison1 != null && subcombinaison2 != null)
+			return (subcombinaison1.getPowerfull() + subcombinaison2.getPowerfull());
+		else
+			return this.kind.ordinal() * (int) cards.stream().mapToInt(a -> a.getIntValue()).sum();
 	}
 	
 	public Card getBestCard()

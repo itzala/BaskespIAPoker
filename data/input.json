@@ -14,8 +14,7 @@
 			  "id": 3,
 			  "name": "Baskesp",
 			  "chips": 1500,
-			  "state": ACTIVE,
-			  "dealer": true
+			  "state": ACTIVE
 			},
     	"count": "2"
   	}
@@ -41,7 +40,7 @@
   }
 }
 {
-  "id": "server.game.cards",
+  "id": "server.game.player.cards",
   "data": {
   	"cards": [
   			{
@@ -54,6 +53,19 @@
 		    }
 	  	]
 	}
+}
+{
+  "id": "server.game.blind.change",
+  "data": {
+    "small":10,
+    "big": 20 
+  }
+}
+{
+  "id": "server.game.turn.start"
+}
+{
+  "id": "server.game.turn.end"
 }
 {
   "id": "server.game.board.cards",
@@ -76,12 +88,10 @@
 }
 
 {
-  "id": "server.player.action",
+  "id": "server.game.player.action",
   "data": {
     "id": 4,
-    "action":{
-  		"value": 500
-	}
+    "value": 50
   }
 }
 
@@ -98,7 +108,7 @@
   }
 }
 {
-  "id": "server.game.play"
+  "id": "server.game.player.play"
 }
 {
   "id": "server.game.play.success"

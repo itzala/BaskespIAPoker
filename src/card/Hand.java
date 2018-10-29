@@ -237,10 +237,29 @@ public class Hand {
 			int nb_cards_quinte = 0;
 			int index_last_card = -1;
 			int next_quintable_value = card_to_compare.getIntValue() - 1;
-						
+			if (card_to_compare.getValue() == ValueCard.AS)
+			{
+				if (this.contains(ValueCard.KING))
+				{
+					next_quintable_value = card_to_compare.getIntValue() - 2;
+					index_last_card = 0;
+				}
+				else if (this.contains(ValueCard.TWO)) 
+				{
+					
+				}
+			}
+			else
+			{
+				nb_cards_quinte = 1;
+				index_last_card = 0;
+			}
+		
+			if (nb_cards_quinte != 5)
+			{
+				cards_quinte.clear();
+			}
 		}
-		
-		
 		/*if (current_nb_cards >= 5)
 		{
 			Card card_to_compare = cards_by_value[current_nb_cards -1];			
@@ -284,6 +303,14 @@ public class Hand {
 		
 	}
 	
+	private boolean contains(ValueCard searched_value) {
+		for (Card card : cards_by_value) {
+			if(card.getValue() == searched_value)
+				return true;
+		}
+		return false;
+	}
+
 	private void calculateQuinteFlush()
 	{
 		//System.out.println("calculateQuinteFlush : "+current_nb_cards+"/"+MAX_NB_CARDS+" cards");
@@ -442,7 +469,7 @@ public class Hand {
 		builder.append(Arrays.toString(cards_by_value));
 		builder.append(",\nMeilleure combinaison = ");
 		builder.append(best_combinaison);
-		builder.append(",\n Variation des jetons =");
+		builder.append(",\n Variation des jetons = ");
 		builder.append(coins_variation);
 		builder.append("\n]");
 		return builder.toString();

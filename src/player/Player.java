@@ -20,6 +20,8 @@ public class Player implements Comparable<Player>{
 	private Hand current_hand;
 	private ArrayList<ActionPlayer> actions;
 	private int nb_coins_begin_hand = 0;
+	private int small_blind = 0;
+	private int big_blind = 0;
 	
 	public Player(int id_player, String name, int coins, StatePlayer state_player)
 	{
@@ -42,6 +44,7 @@ public class Player implements Comparable<Player>{
 	
 	public void initialize()
 	{
+		System.out.println("Initialisation du joueur...");
 		current_action = null;
 		hands = new ArrayList<Hand>();
 		current_hand = new Hand();
@@ -55,42 +58,30 @@ public class Player implements Comparable<Player>{
 	
 	private int getPowerOfHand(int nb_hand, int last_bet)
 	{
-		int ratio_hands = (int) (nb_hand * 100 / Game.NB_MAX_HANDS);
-		int ratio_bet = (int) (last_bet * 100/ nb_coins);
+		System.out.println("[DEBUG] nb_hand =" + nb_hand + ", last_bet = " + last_bet );
+		int ratio_hands = Math.round((nb_hand / Game.NB_MAX_HANDS) * 100);
+		int ratio_bet = Math.round((last_bet / this.nb_coins) * 100);
 		int rank_combinaison = this.current_hand.getBestCombinaison().getPowerfull();
+		System.out.println("[DEBUG] ratio_hands =" + ratio_hands + ", ratio_bet = " + ratio_bet + ", rank_combinaison = " + rank_combinaison );		
+		return (int) Math.max(Math.round((ratio_hands + ratio_bet + rank_combinaison) * 0.75), nb_coins);
+	}
 	
-		if (rank_combinaison >= CombinaisonKind.values().length / 2)
-			return 50;
-		else
-			return (int) (Math.random() * 100);
+	public void updateBlindAmount(int small, int big)
+	{
+		small_blind = small;
+		big_blind = big;
 	}
 		
 	public ActionPlayer doAction(int nb_hand, int last_bet)
 	{
-		/*int power_hand = this.getPowerOfHand(nb_hand, last_bet);
-		
-		if (power_hand >= 80) // notre main est suffisament forte, on relance 
-		{
-			current_action = new ActionPlayer((int)(Math.round(last_bet * 1.5)));;
-		}
-		else if (power_hand >= 50 && power_hand < 80) // on call
-		{
-			current_action = new ActionPlayer(last_bet);
-		}
-		else if (power_hand >= 20 && power_hand < 50) // on check
-		{
-			current_action = new ActionPlayer();
-		}
-		else // on se couche
-		{
-			current_action = new ActionPlayer();
-		}
-				
-		return current_action;*/
-		
-		
-		
-		
+		int power = getPowerOfHand(nb_hand, last_bet);
+		System.out.println("Power of Hand : " + power + " et last_bet : " + last_bet);
+		int next_bet = Math.max(last_bet * power, nb_coins);
+		if (next_bet == nb_coins)
+			this.setState(StatePlayer.ALL_IN);
+		current_action = new ActionPlayer(next_bet, last_bet, small_blind, big_blind);
+		System.out.println("L'ia choisie de faire : " + current_action);
+			
 		return current_action;
 	}
 	
@@ -148,9 +139,10 @@ public class Player implements Comparable<Player>{
 		return this.nb_coins;
 	}
 	
-	public void startNewHand()
+	public void startNewHand(int index_hand)
 	{
-		hands.add(current_hand);
+		if (index_hand > 1)
+			hands.add(current_hand);
 		current_hand = new Hand();
 		this.nb_coins_begin_hand = this.nb_coins;
 	}

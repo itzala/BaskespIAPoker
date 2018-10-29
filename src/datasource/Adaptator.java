@@ -78,13 +78,17 @@ public class Adaptator {
 							Player winner = data_reader.getFinalWinner();
 							game.checkWinner(winner);
 							break;
-						case Message.ID_MESSAGE_GAME_CARDS : 
+						case Message.ID_MESSAGE_GAME_CARDS :
+							this.log("Nouvelles cartes pour le joueur");
+							ArrayList<Card> player_cards = data_reader.getCards();
+							game.addPlayerNewCards(player_cards);
+							this.log("Résultat pour la main => ");
+							this.log(game.getHand().toString());
+							break;
 						case Message.ID_MESSAGE_BOARD_CARDS :
-							ArrayList<Card> cards = data_reader.getCards();
-							this.log("##############################################");
-							this.log("Nouvelles cartes => "+ cards.toString());
-							this.log("##############################################");
-							game.addNewCards(cards);
+							this.log("Nouvelles cartes sur la table....");
+							ArrayList<Card> board_cards = data_reader.getCards();
+							game.addBoardNewCards(board_cards);
 							this.log("Résultat pour la main => ");
 							this.log(game.getHand().toString());
 							break;
@@ -97,6 +101,11 @@ public class Adaptator {
 						case Message.ID_MESSAGE_PLAY :
 							ActionPlayer action = game.doAction();
 							this.log("A vous de jouer !");
+							if (game.isValidAction())
+							{
+								JsonElement data_message = new JsonPrimitive(action.getValue());
+								this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, data_message);
+							}
 							break;
 						case Message.ID_MESSAGE_FAILURE :
 							this.log("Coup invalide... Retentez votre coup");
@@ -106,9 +115,9 @@ public class Adaptator {
 							game.validateAction();
 							break;
 						case Message.ID_MESSAGE_PLAYER_ACTION :
-							ActionPlayer action_other = data_reader.getAction();
+							int bet_value = data_reader.getBetValue();
 							int id_player = data_reader.getIdPlayerAction();
-							game.addActionOtherPlayer(id_player, action_other);
+							game.addBetPlayer(id_player, bet_value);
 							break;
 						case Message.ID_MESSAGE_HAND_START :
 							this.log("Début d'une nouvelle main !!");
@@ -121,6 +130,15 @@ public class Adaptator {
 							break;
 						case Message.ID_MESSAGE_PLAY_TIMEOUT :
 							game.abortPlayOnTimeout();
+							break;
+						case Message.ID_MESSAGE_CHANGE_BLIND :
+							game.updateBlindAmount(data_reader.getBlindAmount());
+							break;
+						case Message.ID_MESSAGE_TURN_START:
+							this.log("Début d'un nouveau tour de mise");
+							break;
+						case Message.ID_MESSAGE_TURN_END:
+							this.log("Fin du tour de mise");
 							break;
 						default:
 							this.log("Message '" + m.getId() + "' non géré...");
