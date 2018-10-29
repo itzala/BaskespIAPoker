@@ -14,13 +14,13 @@ public class Message {
 	public static final String ID_MESSAGE_LOBBY_SUCCESS	= "server.lobby.join.success";
 	public static final String ID_MESSAGE_LOBBY_FAILURE	= "server.lobby.join.failure";
 	public static final String ID_MESSAGE_PLAY		 	= "server.game.player.play";
-	public static final String ID_MESSAGE_FAILURE 		= "server.game.play.failure";
-	public static final String ID_MESSAGE_SUCCESS 		= "server.game.play.success";
+	public static final String ID_MESSAGE_FAILURE 		= "server.game.player.play.failure";
+	public static final String ID_MESSAGE_SUCCESS 		= "server.game.player.play.success";
 	public static final String ID_MESSAGE_GAME_END 		= "server.game.end";
 	public static final String ID_MESSAGE_PLAYER_ACTION	= "server.game.player.action";
 	public static final String ID_MESSAGE_CLIENT_ACTION	= "client.game.player.play";
 	public static final String ID_MESSAGE_JOIN_LOBBY	= "client.lobby.join";
-	public static final String ID_MESSAGE_PLAY_TIMEOUT	= "server.game.play.timeout";
+	public static final String ID_MESSAGE_PLAY_TIMEOUT	= "server.game.player.play.timeout";
 	public static final String ID_MESSAGE_HAND_START 	= "server.game.hand.start";
 	public static final String ID_MESSAGE_HAND_END	 	= "server.game.hand.end";
 	public static final String ID_MESSAGE_CHANGE_BLIND	= "server.game.blind.change";
