@@ -23,6 +23,11 @@ public class Player implements Comparable<Player>{
 	private int small_blind = 0;
 	private int big_blind = 0;
 	
+	public Player(Player model)
+	{
+		this(model.getId(), model.getName(), model.getNbCoins(), model.getState());
+	}
+	
 	public Player(int id_player, String name, int coins, StatePlayer state_player)
 	{
 		this(id_player, name, coins, state_player, false);
@@ -40,6 +45,16 @@ public class Player implements Comparable<Player>{
 			this.nb_coins = coins;
 		
 		this.initialize();
+	}
+	
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	public StatePlayer getState()
+	{
+		return this.state;
 	}
 	
 	public void initialize()

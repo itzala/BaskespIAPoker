@@ -3,30 +3,27 @@ package datasource;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
 
-import card.Card;
 import constantes.Constantes;
-import player.Player;
 
 public class Server {
 	private ServerSocket server;
 	private Gson parser;
 	private Socket s_client;
-	private JsonReader reader;
+	private InputStream reader;
 	private PrintWriter writer;
 	private BufferedReader socket_reader;
 	private boolean shutdown = false;
@@ -35,7 +32,7 @@ public class Server {
 	{
 		parser = new Gson();
 		try {
-			reader = new JsonReader(new FileReader(Constantes.DATAFILE));
+			reader = new FileInputStream(new File(Constantes.DATAFILE));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}	
@@ -52,32 +49,17 @@ public class Server {
 		return shutdown;
 	}
 	
-	public void parseInputFile()
+	public void parseInputFile() throws IOException
 	{
-		try{
-			Message[] messages = parser.fromJson(reader, Message[].class);
-			if (messages != null && messages.length > 0)
-			{
-				for (Message m : messages) {
-					System.out.println("Envoi du message : " + m );
-					this.send(m);
-					switch (m.getId()) {
-					case Message.ID_MESSAGE_GAME_END:
-						shutdown = true;
-						System.out.println("Fin de jeu.... déconnexion du serveur.....");
-						break;
-					}
-				}
-			}
-			else
-			{
-				System.out.println("Pas de données à traiter....");
-			}
+		StringBuilder builder = new StringBuilder();
+		int bytesReaded;
+		byte[] b = new byte[1024];
+			
+		while(reader.available() > 0 && ((bytesReaded = reader.read(b)) > 0)){
+			builder.append(new String(b, 0, bytesReaded));
 		}
-		catch(JsonSyntaxException mfs)
-		{
-			System.out.println("Fichier d'input mal formaté !!! Veuillez corriger votre saisie et sauvegarder pour que cela soit pris en compte....");
-		}
+		System.out.println("Envoi de " + builder.toString());
+		send(builder.toString());
 	}
 	
 	public void parseNewDataInputFile()
@@ -86,7 +68,7 @@ public class Server {
 		{
 			try {
 				reader.close();
-				reader = new JsonReader(new FileReader(Constantes.DATAFILE));
+				reader = new FileInputStream(new File(Constantes.DATAFILE));
 				parseInputFile();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -134,13 +116,12 @@ public class Server {
 			e.printStackTrace();
 		}
 	}
-		
-	public void send(Message m)
+	
+	public void send(String data)
 	{
 		if (writer !=  null)
 		{
-			String message_socket = parser.toJson(m);
-			writer.println(message_socket);
+			writer.print(data);
 			writer.flush();
 		}
 		else

@@ -33,7 +33,7 @@ public class Game {
 	{
 		p.setState(StatePlayer.ACTIVE);
 		p.initialize();
-		ia = p;
+		ia = new Player(p);
 		this.nb_rivals = nb_rivals;
 		rivals = new HashMap<Integer, Player>();
 	}
@@ -55,7 +55,7 @@ public class Game {
 			else
 			{
 				player.initialize();
-				rivals.put(player.getId(), player);
+				rivals.put(player.getId(), new Player(player));
 			}
 		}
 	}
