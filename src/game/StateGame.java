@@ -1,0 +1,11 @@
+package game;
+
+public enum StateGame {
+	GAME_INITIALIZE,
+	GAME_BEGIN,
+	HAND_BEGIN,
+	BET_TURN_BEGIN,
+	BET_TURN_FINISH,
+	HAND_FINISH,
+	GAME_FINISH
+}

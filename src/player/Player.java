@@ -57,12 +57,23 @@ public class Player implements Comparable<Player>{
 		return this.state;
 	}
 	
-	public void initialize()
+	private void log(String message)
 	{
-		System.out.println("Initialisation du joueur...");
+		System.out.println("[ Player ] " + message);
+	}
+	
+	
+	private void debug(String message)
+	{
+		this.log("[DEBUG] " + message);
+	}
+	
+	private void initialize()
+	{
+		this.log("Initialisation du joueur '" + this.name  + "'");
 		current_action = null;
+		current_hand = null;
 		hands = new ArrayList<Hand>();
-		current_hand = new Hand();
 		actions = new ArrayList<ActionPlayer>();
 	}
 	
@@ -73,11 +84,11 @@ public class Player implements Comparable<Player>{
 	
 	private int getPowerOfHand(int nb_hand, int last_bet)
 	{
-		System.out.println("[DEBUG] nb_hand =" + nb_hand + ", last_bet = " + last_bet );
+		this.debug("nb_hand =" + nb_hand + ", last_bet = " + last_bet);
 		int ratio_hands = Math.round((nb_hand / Game.NB_MAX_HANDS) * 100);
 		int ratio_bet = Math.round((last_bet / this.nb_coins) * 100);
 		int rank_combinaison = this.current_hand.getBestCombinaison().getPowerfull();
-		System.out.println("[DEBUG] ratio_hands =" + ratio_hands + ", ratio_bet = " + ratio_bet + ", rank_combinaison = " + rank_combinaison );		
+		this.debug("ratio_hands =" + ratio_hands + ", ratio_bet = " + ratio_bet + ", rank_combinaison = " + rank_combinaison );		
 		return (int) Math.max(Math.round((ratio_hands + ratio_bet + rank_combinaison) * 0.75), nb_coins);
 	}
 	
@@ -95,7 +106,7 @@ public class Player implements Comparable<Player>{
 		if (next_bet == nb_coins)
 			this.setState(StatePlayer.ALL_IN);
 		current_action = new ActionPlayer(next_bet, last_bet, small_blind, big_blind);
-		System.out.println("L'ia choisie de faire : " + current_action);
+		this.log("L'ia choisie de faire : " + current_action);
 			
 		return current_action;
 	}
@@ -110,7 +121,7 @@ public class Player implements Comparable<Player>{
 		}
 		else
 		{
-			System.out.println("Pas d'action courrante d'enregistrée.... ");
+			this.log("Pas d'action courante d'enregistrée.... ");
 		}
 	}
 	
@@ -156,9 +167,10 @@ public class Player implements Comparable<Player>{
 	
 	public void startNewHand(int index_hand)
 	{
-		if (index_hand > 1)
+		if (index_hand > 1){
 			hands.add(current_hand);
-		current_hand = new Hand();
+		}
+		current_hand = new Hand(index_hand);
 		this.nb_coins_begin_hand = this.nb_coins;
 	}
 	

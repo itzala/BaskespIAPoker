@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Hand {
+	private int index_hand;
 	private final int MAX_NB_CARDS = 7;
 	private int current_nb_cards = 0;
 	private Card[] cards_by_value = new Card[MAX_NB_CARDS];
@@ -23,8 +24,9 @@ public class Hand {
 	private int coins_variation = 0;
 	
 	
-	public Hand()
+	public Hand(int index)
 	{
+		this.index_hand = index;
 		initializeCards();
 	}
 	

@@ -27,36 +27,56 @@ public class Game {
 	private int big_blind = 0;
 	private int nb_rivals = 0;
 	private Timer timeout_action;
-	boolean is_valid = false;
+	private boolean is_valid = false;
+	private StateGame state = StateGame.GAME_INITIALIZE;
+	
+	private void log(String message)
+	{
+		System.out.println("[ Game ] " + message);
+	}
+	
 	
 	public void startGame(Player p, int nb_rivals)
 	{
-		p.setState(StatePlayer.ACTIVE);
-		p.initialize();
 		ia = new Player(p);
 		this.nb_rivals = nb_rivals;
 		rivals = new HashMap<Integer, Player>();
 	}
 	
+	private Player getLocalPlayerFor(Player player)
+	{
+		this.log("Récupération du localPlayer pour '"+player.getName()+"'");
+		if (ia.isSameThan(player)){
+			return ia;
+		} else{
+			return rivals.get(player.getId());
+		}
+	}
+	
 	
 	private void updateInfosPlayer(Player player)
 	{
-		if (ia.isSameThan(player))
-		{
-			ia.updateInfoFrom(player);
+		Player localPlayer = getLocalPlayerFor(player) ;
+		
+		if (localPlayer != null){
+			localPlayer.updateInfoFrom(player);
+		} else {
+			localPlayer = new Player(player);
+			rivals.put(player.getId(), localPlayer);
 		}
-		else
-		{
-			if (rivals.containsKey(player.getId()))
-			{
-				Player rival = rivals.get(player.getId());
-				rival.updateInfoFrom(player);
-			}
-			else
-			{
-				player.initialize();
-				rivals.put(player.getId(), new Player(player));
-			}
+		
+		switch (state) {
+			case HAND_BEGIN:
+				if (!localPlayer.isFolded()){
+					this.log("Le joueur '"+ localPlayer.getName() + "' continue...");
+					localPlayer.startNewHand(nb_hand);
+				} else {
+					this.log("Le joueur '"+ localPlayer.getName() + "' s'est couché...");
+				}
+				break;
+			case HAND_FINISH:
+				localPlayer.uptdateVariationCoinsEndHand(player.getNbCoins());
+				break;
 		}
 	}
 	
@@ -71,14 +91,14 @@ public class Game {
 	public void startHand(Player[] players_hand)
 	{
 		nb_hand++;
-		if (nb_hand <= NB_MAX_HANDS)
-		{
+		if (nb_hand <= NB_MAX_HANDS){
 			last_bet = 0;
+			this.log("Début de la main n°" + nb_hand);
 			for (Player player : players_hand) {
-				if (!player.isFolded())
-					player.startNewHand(nb_hand);
-				this.updateInfosPlayer(player);
+				this.updateInfosPlayer(player);	
 			}
+		} else {
+			this.log("Nombre maximal de main atteint !!");
 		}
 	}
 	
@@ -98,12 +118,8 @@ public class Game {
 	
 	public void finishHand(Player[] winners)
 	{
+		this.log("Fin de la main... Mise à jour des joueurs vainqueurs ");
 		for (Player player : winners) {
-			if (ia.isSameThan(player))
-			{
-				ia.uptdateVariationCoinsEndHand(player.getNbCoins());
-				break;
-			}
 			this.updateInfosPlayer(player);
 		}
 	}
@@ -114,7 +130,6 @@ public class Game {
 		is_valid = true;
 		timeout_action.cancel();
 		timeout_action = null;
-		System.out.println(System.currentTimeMillis());
 	}
 	
 	public boolean isValidAction()
@@ -125,25 +140,20 @@ public class Game {
 	public ActionPlayer doAction()
 	{
 		ActionPlayer action = null;
-		if (! ia.isFolded())
-		{
+		if (! ia.isFolded()) {
 			timeout_action = new Timer();
 			is_valid = false;
 			timeout_action.schedule(new TimerTask() {
 				
 				@Override
 				public void run() {
-					if (!is_valid)
-					{
-						System.out.println("Timeout !");
-						if (last_bet != 0)
-						{
+					if (!is_valid) {
+						System.out.println("[Game] Timeout !");
+						if (last_bet != 0) {
 							ia.setState(StatePlayer.FOLDED);
 						}
-					}
-					else
-					{
-						System.out.println("Coup validé dans les temps....");
+					} else {
+						System.out.println("[Game] Coup validé dans les temps....");
 					}
 				}
 			}, Constantes.TIME_BEFORE_TIMEOUT * 1000);
@@ -164,39 +174,39 @@ public class Game {
 	}
 
 	public void checkWinner(Player winner) {
-		if (ia.isSameThan(winner))
-		{
-			System.out.println("Le vainqueur.... c'est...... MOI !!");
-		}
-		else
-		{
-			System.out.println("Ah... comment.... j'ai pas gagné ? Zut !");
+		if (ia.isSameThan(winner)){
+			this.log("Le vainqueur.... c'est...... MOI !!");
+		} else {
+			this.log("Ah... comment.... j'ai pas gagné ? Zut !");
 		}
 	}
 
 
 	public void abortPlayOnTimeout() {
-		System.out.println("Action annulée... Timeout !");
+		this.log("Action annulée... Timeout !");
+		is_valid = false;
+		timeout_action.cancel();
+		timeout_action = null;
 	}
 
 
 	public void addBetPlayer(int id_player, int bet_value) {
 		
-		if (id_player != ia.getId())
-		{
+		if (id_player != ia.getId()) {
 			Player rival = rivals.get(id_player);
-			if (rival != null)
-			{
+			if (rival != null) {
 				rival.updateCoinsAfterAction(new ActionPlayer(bet_value, last_bet, small_blind, big_blind));
+			} else {
+				this.log("Attention, pas de joueur n°" + id_player + " enregistré...");
 			}
-			else
-				System.out.println("Attention, pas de joueur n°" + id_player + " enregistré...");
-		}
-		else
-		{
+		} else {
 			ia.updateCoinsAfterAction(new ActionPlayer(bet_value, last_bet, small_blind, big_blind));
 		}
 		last_bet = bet_value;
-		
+	}
+	
+	public void setStateGame(StateGame newState)
+	{
+		this.state = newState;
 	}
 }
