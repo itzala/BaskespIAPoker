@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonReader;
 import card.Card;
 import constantes.Constantes;
 import game.Game;
+import game.StateGame;
 import player.ActionPlayer;
 import player.Player;
 
@@ -74,31 +75,25 @@ public class Adaptator {
 	
 	private List<Message> parseReceivedData(String data, List<Message> messages){
 		try{
-			if (! data.isEmpty()){
-				System.out.println("Data en cours de parsing.... " + data);
-				System.out.println("Liste des messges déjà parsés : " + messages);
-			}
-				
 			Message m = gson.fromJson(data, Message.class);
 			if (m != null){
-				System.out.println("Id du nouveau messge " + m.getId());
 				messages.add(m);
 			}
 		}catch(Exception e)
 		{
-			System.out.println("Attention, double message reçu ! ");
+			/* Permet de gérer le cas où le protocole TCP optimise les envois et que l'on reçoit plusieurs messages en suivant */
 			Pattern errorMessagePattern = Pattern.compile("to accept malformed JSON at line 1 column ([0-9]+) path");
 			Matcher matcher = errorMessagePattern.matcher(e.getMessage());
-			
-			System.out.println(e.getMessage());
 			
 			if (matcher.find())
 			{
 				int indexBadCharacter = Integer.parseInt(matcher.group(1))-2;
-				String subData = data.substring(0, indexBadCharacter);
-				messages = this.parseReceivedData(subData, messages);
-				subData = data.substring(indexBadCharacter);
-				return this.parseReceivedData(subData, messages);
+				Message m = gson.fromJson(data.substring(0, indexBadCharacter), Message.class);
+				if (m != null){
+					messages.add(m);
+				}
+				String nextData = data.substring(indexBadCharacter);
+				this.parseReceivedData(nextData, messages); // la liste sera mise à jour lors des appels récursifs
 			}
 		}
 		return messages;
@@ -116,24 +111,24 @@ public class Adaptator {
 				while(!disconnect){
 					String receivedData = readDataFrom(streamFromSocket);
 					if (!receivedData.isEmpty()){
-						System.out.println("Nouvelles données reçues : " + receivedData);
 						List<Message> receivedMessages = parseReceivedData(receivedData);
-						
-						System.out.println("Messages à traiter ? => " + receivedMessages);
 						
 						for (Message m : receivedMessages) {
 							DataReader dataReader = new DataReader();
 							dataReader.setMessage(m);
 							this.log("----------------------------------------------");
+							this.log("Message à traiter : " + m.getId());
 							switch (m.getId()) {
 								case Message.ID_MESSAGE_GAME_START :
 									Player p = dataReader.getPlayer();
 									int nb_rivals = dataReader.getNbRivals();
+									game.setStateGame(StateGame.GAME_BEGIN);
 									game.startGame(p, nb_rivals);
 									this.log("Info player : " + game.getPlayer());
 									break;
 								case Message.ID_MESSAGE_GAME_END :
 									Player winner = dataReader.getFinalWinner();
+									game.setStateGame(StateGame.GAME_FINISH);
 									game.checkWinner(winner);
 									disconnect = true;
 									break;
@@ -179,10 +174,12 @@ public class Adaptator {
 									break;
 								case Message.ID_MESSAGE_HAND_START :
 									this.log("Début d'une nouvelle main !!");
+									game.setStateGame(StateGame.HAND_BEGIN);
 									Player[] playersHand = dataReader.getPlayers();
 									game.startHand(playersHand);
 									break;
 								case Message.ID_MESSAGE_HAND_END :
+									game.setStateGame(StateGame.HAND_FINISH);
 									Player[] winners = dataReader.getWinners();
 									game.finishHand(winners);
 									break;

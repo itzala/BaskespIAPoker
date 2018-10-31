@@ -31,14 +31,6 @@ public class DataReader {
 		return message;
 	}
 	
-	public Gson getParser() {
-		return parser;
-	}
-
-	public void setParser(Gson parser) {
-		this.parser = parser;
-	}
-	
 	public ArrayList<Card> getCards()
 	{
 		Type listType = new TypeToken<List<Card>>() {}.getType();
@@ -57,8 +49,11 @@ public class DataReader {
 	public Player getPlayer()
 	{
 		Player current_player = parser.fromJson(message.getRawData(Message.DATA_KEY_INFO_PLAYER).toString(), Player.class);
-		if (current_player == null)
+		if (current_player == null){
 			System.out.println("[WARNING] Pas de joueur accessible !");
+		}else{
+			System.out.println("Player reçu !");
+		}
 		
 		return current_player;
 	}
