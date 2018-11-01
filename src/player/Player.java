@@ -89,7 +89,7 @@ public class Player implements Comparable<Player>{
 		int ratio_bet = Math.round((last_bet / this.nb_coins) * 100);
 		int rank_combinaison = this.current_hand.getBestCombinaison().getPowerfull();
 		this.debug("ratio_hands =" + ratio_hands + ", ratio_bet = " + ratio_bet + ", rank_combinaison = " + rank_combinaison );		
-		return (int) Math.max(Math.round((ratio_hands + ratio_bet + rank_combinaison) * 0.75), nb_coins);
+		return (int) Math.min(Math.round((ratio_hands + ratio_bet + rank_combinaison) * 0.75), nb_coins);
 	}
 	
 	public void updateBlindAmount(int small, int big)
