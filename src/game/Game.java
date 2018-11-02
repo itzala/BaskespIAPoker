@@ -132,6 +132,11 @@ public class Game {
 		timeout_action = null;
 	}
 	
+	public boolean isLocalValidAction()
+	{
+		return true;
+	}
+	
 	public boolean isValidAction()
 	{
 		return is_valid;

@@ -155,13 +155,19 @@ public class Adaptator {
 								case Message.ID_MESSAGE_PLAY :
 									ActionPlayer action = game.doAction();
 									this.log("A vous de jouer !");
-									if (game.isValidAction()){
+									if (game.isLocalValidAction()){
 										JsonElement dataMessage = new JsonPrimitive(action.getValue());
 										this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
 									}
 									break;
 								case Message.ID_MESSAGE_FAILURE :
 									this.log("Coup invalide... Retentez votre coup");
+									ActionPlayer actionRetry = game.doAction();
+									this.log("A vous de jouer !");
+									if (game.isLocalValidAction()){
+										JsonElement dataMessage = new JsonPrimitive(actionRetry.getValue());
+										this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
+									}
 									break;
 								case Message.ID_MESSAGE_SUCCESS :
 									this.log("Coup valide donc pris en compte !");
@@ -215,7 +221,7 @@ public class Adaptator {
 		Map<String, JsonElement> data = new HashMap<String, JsonElement>();
 		switch (idMessage){
 			case Message.ID_MESSAGE_CLIENT_ACTION:
-				data.put(Message.DATA_KEY_ACTION, dataMessage);
+				data.put(Message.DATA_KEY_VALUE, dataMessage);
 				break;
 			case Message.ID_MESSAGE_JOIN_LOBBY:
 				data.put(Message.DATA_KEY_NAME_TEAM, dataMessage);
