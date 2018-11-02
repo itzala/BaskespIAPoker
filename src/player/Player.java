@@ -102,7 +102,7 @@ public class Player implements Comparable<Player>{
 	{
 		double power = 1.5; //getPowerOfHand(nb_hand, last_bet);
 		System.out.println("Power of Hand : " + power + " et last_bet : " + last_bet);
-		int next_bet = (int) Math.max(last_bet * power, nb_coins);
+		int next_bet = (int) Math.min(last_bet * power, nb_coins);
 		if (next_bet == nb_coins)
 			this.setState(StatePlayer.ALL_IN);
 		current_action = new ActionPlayer(next_bet, last_bet, small_blind, big_blind);
