@@ -8,15 +8,15 @@ public class Card implements Comparable<Card>{
 	
 	private @SerializedName("kind") ValueCard value;
 	private ColorCard color;
-	private int index_card;
+	private int indexCcard;
 	
 	
-	public int getIndex_card() {
-		return index_card;
+	public int getIndexCard() {
+		return indexCcard;
 	}
 
-	public void setIndex_card(int index_card) {
-		this.index_card = index_card;
+	public void setIndexCard(int index) {
+		this.indexCcard = index;
 	}
 
 	
@@ -38,7 +38,7 @@ public class Card implements Comparable<Card>{
 	{
 		this.color = color;
 		this.value = value;
-		this.index_card = index_card;
+		this.indexCcard = index_card;
 	}
 	
 	public ValueCard getValue()
@@ -108,27 +108,43 @@ public class Card implements Comparable<Card>{
 	@Override
 	public int compareTo(Card c) 
 	{
-		if (this.getValue() == ValueCard.NONE)
+		if (c == null){
 			return 1;
-		if (this.getValue().ordinal() == c.getValue().ordinal())
+		}	
+		if (this.getValue().ordinal() == c.getValue().ordinal()){
 			return 0;
-		if (this.getValue().ordinal() > c.getValue().ordinal())
+		}
+		if (this.getValue().ordinal() > c.getValue().ordinal()){
 			return 1;
-		else
+		}
+		else {
 			return -1;
+		}
 	}
 	
 	public static Comparator<Card> ColorCardComparator =  new Comparator<Card>(){
 		
 		public int compare(Card c1, Card c2){
-			if (c1.getColor() == ColorCard.NONE)
-				return 1;
-			if (c1.getColor().ordinal() == c2.getColor().ordinal())
-				return 0;
-			if (c1.getColor().ordinal() > c2.getColor().ordinal())
-				return 1;
-			else
+			
+			if (c1 == null && c2 != null)
 				return -1;
+			if (c1 != null && c2 == null)
+				return 1;
+			
+			if (c1.getColor().ordinal() == c2.getColor().ordinal()){
+				return 0;
+			}
+			if (c1.getColor().ordinal() > c2.getColor().ordinal()){
+				return 1;
+			}
+			else {
+				return -1;
+			}
 		}
 	};
+
+
+	public boolean isValid() {
+		return false;
+	}
 }

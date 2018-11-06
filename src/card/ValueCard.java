@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 //Valeurs triees par ordre de puissance
 
 public enum ValueCard {
-	NONE,
+	ONE,
 	@SerializedName("2") TWO,
 	@SerializedName("3") THREE,
 	@SerializedName("4") FOUR,

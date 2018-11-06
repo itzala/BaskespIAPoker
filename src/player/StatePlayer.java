@@ -1,5 +1,8 @@
 package player;
 
 public enum StatePlayer {
-	ACTIVE, FOLDED, ALL_IN
+	ACTIVE, 
+	FOLDED,
+	CHECK,
+	ALL_IN
 }

@@ -51,7 +51,8 @@ public class Combinaison implements Comparable<Combinaison>{
 	{
 		if (cards != null) // combinaison "atomique" telle que le carre, le brelan, la paire, etc...
 		{
-			Card best_card = new Card(ValueCard.NONE, ColorCard.NONE);
+			Card best_card = null;
+			//Card best_card = null;
 			for (Card card : cards) {
 				if (card.isStrongerThan(best_card))
 					best_card = card;
@@ -110,7 +111,12 @@ public class Combinaison implements Comparable<Combinaison>{
 		if (subcombinaison1 == null && subcombinaison2 == null)
 		{
 			builder.append(", Cartes = ");
-			builder.append(cards);
+			for (Card card : cards) {
+				if (card.isValid()){
+					builder.append(card);
+				}
+			}
+			
 		}
 		else
 		{

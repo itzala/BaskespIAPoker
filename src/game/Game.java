@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import card.Card;
-import card.Hand;
+import card.Hand_OLD;
 import constantes.Constantes;
 import datasource.Message;
 
@@ -169,7 +169,7 @@ public class Game {
 		return action;
 	}
 	
-	public Hand getHand() {
+	public Hand_OLD getHand() {
 		
 		return ia.getHand();
 	}

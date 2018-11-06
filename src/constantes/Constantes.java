@@ -12,4 +12,6 @@ public interface Constantes {
 	public final String PLAYER_NAME			= "Baskesp";
 	
 	public final int TIME_BEFORE_TIMEOUT 	= 15;	// temps en secondes
+	
+	public final int NB_MAX_CARDS			= 7;
 }
