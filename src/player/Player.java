@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import card.Card;
 import card.CombinaisonKind;
-import card.Hand_OLD;
+import card.Hand;
 import game.Game;
 import player.ActionPlayer;
 import player.StatePlayer;
@@ -18,8 +18,8 @@ public class Player implements Comparable<Player>{
 	private ActionPlayer current_action;
 	private StatePlayer state;
 	private boolean dealer;
-	private ArrayList<Hand_OLD> hands;
-	private Hand_OLD current_hand;
+	private ArrayList<Hand> hands;
+	private Hand current_hand;
 	private ArrayList<ActionPlayer> actions;
 	private int nb_coins_begin_hand = 0;
 	private int small_blind = 0;
@@ -75,7 +75,7 @@ public class Player implements Comparable<Player>{
 		this.log("Initialisation du joueur '" + this.name  + "'");
 		current_action = null;
 		current_hand = null;
-		hands = new ArrayList<Hand_OLD>();
+		hands = new ArrayList<Hand>();
 		actions = new ArrayList<ActionPlayer>();
 	}
 	
@@ -172,7 +172,7 @@ public class Player implements Comparable<Player>{
 		if (index_hand > 1){
 			hands.add(current_hand);
 		}
-		current_hand = new Hand_OLD(index_hand);
+		current_hand = new Hand(index_hand);
 		this.nb_coins_begin_hand = this.nb_coins;
 	}
 	
@@ -186,7 +186,7 @@ public class Player implements Comparable<Player>{
 		current_hand.setCoinsVariation(nb_coins_end_hand - nb_coins_begin_hand);
 	}
 	
-	public Hand_OLD getHand() {
+	public Hand getHand() {
 		
 		return current_hand;
 	}

@@ -1,7 +1,7 @@
 package constantes;
 
 public interface Constantes {
-	public final int SERVER_PORT			= 1300;
+	public final int SERVER_PORT			= 4000;
 	public final String SERVER_ADDRESS		= "127.0.0.1";
 	
 	public final String DATA_DIRECOTY		= System.getProperty("user.dir") + "/data";
