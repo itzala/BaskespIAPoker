@@ -32,7 +32,7 @@ public class Game {
 	
 	private void log(String message)
 	{
-		System.out.println("[ Game ] " + message);
+		System.out.println("[ GAME ] " + message);
 	}
 	
 	
@@ -77,6 +77,9 @@ public class Game {
 			case HAND_FINISH:
 				localPlayer.uptdateVariationCoinsEndHand(player.getNbCoins());
 				break;
+			default :
+				// on ne gère pas les autres cas ici...
+				break;
 		}
 	}
 	
@@ -93,7 +96,7 @@ public class Game {
 		nb_hand++;
 		if (nb_hand <= NB_MAX_HANDS){
 			last_bet = 0;
-			this.log("Début de la main n°" + nb_hand);
+			this.log("=================== Début de la main n°" + nb_hand + "===================");
 			for (Player player : players_hand) {
 				this.updateInfosPlayer(player);	
 			}
@@ -180,9 +183,9 @@ public class Game {
 
 	public void checkWinner(Player winner) {
 		if (ia.isSameThan(winner)){
-			this.log("Le vainqueur.... c'est...... MOI !!");
+			this.log("I win !");
 		} else {
-			this.log("Ah... comment.... j'ai pas gagné ? Zut !");
+			this.log("OK, I loose one fight but not the war !");
 		}
 	}
 

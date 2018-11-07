@@ -140,8 +140,7 @@ public class Player implements Comparable<Player>{
 	
 	public Player addCards(ArrayList<Card> list_card)
 	{
-		for (Card c : list_card) {
-			
+		for (Card c : list_card) {			
 			addNewCard(c);
 		}
 		return this;

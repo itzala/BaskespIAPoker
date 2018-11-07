@@ -15,7 +15,6 @@ public class Combinaison implements Comparable<Combinaison>{
 	public Combinaison(CombinaisonKind kind, ArrayList<Card> c)
 	{
 		this.kind = kind;
-		
 		if (c != null)
 		{
 			if (cards == null)
@@ -47,6 +46,11 @@ public class Combinaison implements Comparable<Combinaison>{
 			return this.kind.ordinal() * (int) cards.stream().mapToInt(a -> a.getIntValue()).sum();
 	}
 	
+	public CombinaisonKind getKind()
+	{
+		return this.kind;
+	}
+	
 	public Card getBestCard()
 	{
 		if (cards != null) // combinaison "atomique" telle que le carre, le brelan, la paire, etc...
@@ -70,7 +74,10 @@ public class Combinaison implements Comparable<Combinaison>{
 	
 	public boolean isStrongerThan(Combinaison c)
 	{
-		return c != null && compareTo(c) == 1;
+		if (c == null){
+			return true;
+		}
+		return compareTo(c) == 1;
 	}
 	
 	public boolean isValid()
@@ -112,9 +119,7 @@ public class Combinaison implements Comparable<Combinaison>{
 		{
 			builder.append(", Cartes = ");
 			for (Card card : cards) {
-				if (card.isValid()){
-					builder.append(card);
-				}
+				builder.append(card);
 			}
 			
 		}

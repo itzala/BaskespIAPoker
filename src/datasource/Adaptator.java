@@ -45,7 +45,7 @@ public class Adaptator {
 	public void connect()
 	{
 		try {
-			this.log("Connexion au serveur : " + Constantes.SERVER_ADDRESS + ":"  + Constantes.SERVER_PORT);
+			this.log("Connexion au serveur : " + Constantes.SERVER_ADDRESS + " sur le port "  + Constantes.SERVER_PORT);
 			clientSocket = new Socket(Constantes.SERVER_ADDRESS, Constantes.SERVER_PORT);
 			streamFromSocket = clientSocket.getInputStream();
 			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
@@ -100,7 +100,7 @@ public class Adaptator {
 	}
 	
 	private void log(String message){
-		System.out.println("[ CLIENT ] " + message);
+		System.out.println("[ ADAPTATEUR ] " + message);
 	}
 
 	public void listen(){
@@ -136,14 +136,12 @@ public class Adaptator {
 									this.log("Nouvelles cartes pour le joueur");
 									ArrayList<Card> playerCards = dataReader.getCards();
 									game.addPlayerNewCards(playerCards);
-									this.log("Résultat pour la main => ");
 									this.log(game.getHand().toString());
 									break;
 								case Message.ID_MESSAGE_BOARD_CARDS :
 									this.log("Nouvelles cartes sur la table....");
 									ArrayList<Card> boardCards = dataReader.getCards();
-									game.addBoardNewCards(boardCards);
-									this.log("Résultat pour la main => ");
+									game.addBoardNewCards(boardCards);									
 									this.log(game.getHand().toString());
 									break;
 								case Message.ID_MESSAGE_LOBBY_SUCCESS :
@@ -162,15 +160,14 @@ public class Adaptator {
 									break;
 								case Message.ID_MESSAGE_FAILURE :
 									this.log("Coup invalide... Retentez votre coup");
-									ActionPlayer actionRetry = game.doAction();
-									this.log("A vous de jouer !");
+									ActionPlayer actionRetry = game.doAction();									
 									if (game.isLocalValidAction()){
 										JsonElement dataMessage = new JsonPrimitive(actionRetry.getValue());
 										this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
 									}
 									break;
 								case Message.ID_MESSAGE_SUCCESS :
-									this.log("Coup valide donc pris en compte !");
+									this.log("Coup valide pris en compte !");
 									game.validateAction();
 									break;
 								case Message.ID_MESSAGE_PLAYER_ACTION :
@@ -179,7 +176,6 @@ public class Adaptator {
 									game.addBetPlayer(idPlayer, betValue);
 									break;
 								case Message.ID_MESSAGE_HAND_START :
-									this.log("Début d'une nouvelle main !!");
 									game.setStateGame(StateGame.HAND_BEGIN);
 									Player[] playersHand = dataReader.getPlayers();
 									game.startHand(playersHand);

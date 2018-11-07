@@ -15,10 +15,15 @@ public class Hand {
 	
 	private Combinaison bestCombinaison;
 	private int[][] statsCards;
-	private final int COUNT_LINE_STAT 	= Card.getNbColors();	
-	private final int COUNT_COLUMN_STAT = Card.getNbDifferentValues();
+	private final int COUNT_LINE_STAT 	= Card.getNbDifferentValues();
+	private final int COUNT_COLUMN_STAT = Card.getNbColors();
 
 	private int coinsVariation;
+	
+	private void log(String message)
+	{
+		System.out.println("[ MAIN ] " + message);
+	}
 	
 	public Hand(int index) {
 		indexHand = index;
@@ -26,11 +31,13 @@ public class Hand {
 		cards = new ArrayList<Card>();
 		
 		// On ajoute 1 pour gérer les compteurs
+		this.log("Initialisation de la main....");		
 		statsCards = new int[COUNT_LINE_STAT + 1][COUNT_COLUMN_STAT + 1];
 		bestCombinaison = null;
 		
-		coinsVariation = -1;
+		coinsVariation = 0;
 		
+		this.log("	Initialisation des statistiques....");
 		// initialisation des index
 		for (int i = 0; i < COUNT_LINE_STAT ; i++) {
 			for (int j = 0; j < COUNT_COLUMN_STAT; j++){
@@ -39,7 +46,7 @@ public class Hand {
 		}
 		
 		// initilisation des compteurs
-		for (int i = 0; i < COUNT_LINE_STAT; i++) {	// pour les 
+		for (int i = 0; i < COUNT_LINE_STAT; i++) {	 
 			statsCards[i][COUNT_COLUMN_STAT] = 0;
 		}
 		for (int j = 0; j < COUNT_COLUMN_STAT; j++){
@@ -49,23 +56,30 @@ public class Hand {
 	
 	public void addCard(Card c) {
 		if (! cards.contains(c) && cards.size() < Constantes.NB_MAX_CARDS){
+			int indexNewCard = cards.size();			
+			c.setIndexCard(indexNewCard);
 			cards.add(c);
+			this.log("Ajout de la carte n°" + (indexNewCard + 1) + " => " + c);
 			/* 		Mise à jour des stats			*/
 			
-			int line = c.getColor().ordinal();
-			int column = c.getIntValue() ;
-			statsCards[line][column] = c.getIndexCard();
+			int line   = c.getIntValue() ;
+			int column = c.getColor().ordinal();
+			
+			statsCards[line][column] = c.getIndexCard();			
 			statsCards[COUNT_LINE_STAT][column]++;
 			statsCards[line][COUNT_COLUMN_STAT]++;
 			
 			
 			// Gestion du cas de l'AS qui représente aussi le 1
 			if (c.getValue() == ValueCard.AS){
-				column = ValueCard.ONE.ordinal();
+				line = ValueCard.ONE.ordinal();
 				statsCards[line][column] = c.getIndexCard();
 				statsCards[COUNT_LINE_STAT][column]++;
 				statsCards[line][COUNT_COLUMN_STAT]++;
 			}
+			
+			this.log("	Mes cartes : " + cards);
+			calculateCombinaisons();
 		}
 	}
 	
@@ -79,18 +93,18 @@ public class Hand {
 	{
 		int index = -1;
 		
-		// on cherche dans les compteurs par valeurs
+		// on cherche dans les compteurs par valeurs (dernière colonne)
 		if (inValue){ 
 			for (int i = COUNT_LINE_STAT; i >= 0; i--){
-				if (statsCards[COUNT_COLUMN_STAT][i] == countSearched && i != excludedCount){
+				if (statsCards[i][COUNT_COLUMN_STAT] == countSearched && i != excludedCount){
 					index = i;
 					break;
 				}
 			}
 		} else {
-			// on cherche dans les compteurs par couleurs
+			// on cherche dans les compteurs par couleurs (dernière ligne)
 			for (int i = COUNT_COLUMN_STAT; i >= 0; i--){
-				if (statsCards[i][COUNT_LINE_STAT] == countSearched && i != excludedCount){
+				if (statsCards[COUNT_LINE_STAT][i] == countSearched && i != excludedCount){
 					index = i;
 					break;
 				}
@@ -101,17 +115,22 @@ public class Hand {
 	}
 	
 	private Card getCardByStatIndex(int line, int column){
-		if ((line > 0 && line <= COUNT_LINE_STAT)
-				&& (column > 0 && column <= COUNT_COLUMN_STAT)
-				&& statsCards[column][line] != -1){
-			return cards.get(statsCards[column][line]);
+		if ((line > 0 && line < COUNT_LINE_STAT)
+				&& (column > 0 && column < COUNT_COLUMN_STAT)
+				&& statsCards[line][column] != -1){
+			return cards.get(statsCards[line][column]);
 		}
 		return null;
 	}
 	
+	// Renvoie toutes les cartes de même couleur
 	private List<Card>  getCardsByLine(int line){
 		ArrayList<Card> cardsList = new ArrayList<Card>();
-		for (int i = COUNT_COLUMN_STAT; i >= 0; i--){
+		// Gestion de l'AS
+		if (line == ValueCard.ONE.ordinal()){
+			line = ValueCard.AS.ordinal();
+		}
+		for (int i = COUNT_COLUMN_STAT - 1 ; i >= 0; i--){
 			Card c = getCardByStatIndex(line, i);
 			if (c != null){
 				cards.add(c);
@@ -120,22 +139,24 @@ public class Hand {
 		return cardsList;
 	}
 	
+	// Renvoie toutes les cartes de même valeur
 	private List<Card>  getCardsByColumn(int column){
 		ArrayList<Card> cardsList = new ArrayList<Card>();
-		for (int i = COUNT_LINE_STAT; i >= 0; i--){
+		for (int i = COUNT_LINE_STAT - 1; i >= 0; i--){
 			Card c = getCardByStatIndex(i, column);
 			if (c != null){
-				cards.add(c);
+				cardsList.add(c);
 			}
 		}
 		return cardsList;
 	}
 	
-	private Combinaison getCombinaisonForPaire(int excludedValue) {
+	private Combinaison getCombinaisonForPaire(int excludedValue) {		
 		int indexPaire = getIndexOfFirstCount(2, true, excludedValue);
 		if (indexPaire != -1){
 			ArrayList<Card> cardsPaire = new ArrayList<Card>();
 			cardsPaire.addAll(getCardsByLine(indexPaire));
+			this.log("	PAIRE trouvée");
 			return new Combinaison(CombinaisonKind.PAIRE, cardsPaire);
 		}
 		return null;
@@ -146,6 +167,7 @@ public class Hand {
 		if (indexBrelan != -1){
 			ArrayList<Card> cardsBrelan = new ArrayList<Card>();
 			cardsBrelan.addAll(getCardsByLine(indexBrelan));
+			this.log("	BRELAN trouvé");
 			return new Combinaison(CombinaisonKind.BRELAN, cardsBrelan);
 		}
 		return null;
@@ -156,16 +178,18 @@ public class Hand {
 		if (indexCarre != -1){
 			ArrayList<Card> cardsCarre = new ArrayList<Card>();
 			cardsCarre.addAll(getCardsByLine(indexCarre));
+			this.log("	CARRE trouvé");
 			return new Combinaison(CombinaisonKind.CARRE, cardsCarre);
 		}
 		return null;
 	}
 	
-	private Combinaison getCombinaisonForCFull() {
+	private Combinaison getCombinaisonForFull() {
 		Combinaison brelan = getCombinaisonForBrelan();
 		if (brelan != null){
 			Combinaison paire = getCombinaisonForPaire(brelan.getBestCard().getIntValue());
 			if (paire != null){
+				this.log("	FULL trouvé");
 				return new Combinaison(CombinaisonKind.FULL, brelan, paire);
 			}
 		}
@@ -173,11 +197,12 @@ public class Hand {
 	}
 	
 	private Combinaison getCombinaisonForDoublePaire(){
-		Combinaison firtPaire = getCombinaisonForBrelan();
-		if (firtPaire != null){
-			Combinaison secondPaire = getCombinaisonForPaire(firtPaire.getBestCard().getIntValue());
+		Combinaison firstPaire = getCombinaisonForBrelan();
+		if (firstPaire != null){
+			Combinaison secondPaire = getCombinaisonForPaire(firstPaire.getBestCard().getIntValue());
 			if (secondPaire != null){
-				return new Combinaison(CombinaisonKind.DOUBLE_PAIRE, firtPaire, secondPaire);
+				this.log("	DOUBLE PAIRE trouvée");
+				return new Combinaison(CombinaisonKind.DOUBLE_PAIRE, firstPaire, secondPaire);
 			}
 		}
 		return null;
@@ -188,6 +213,7 @@ public class Hand {
 		if (indexColor != -1){
 			ArrayList<Card> cardsColor = new ArrayList<Card>();
 			cardsColor.addAll(getCardsByLine(indexColor));
+			this.log("	COULEUR trouvée");
 			return new Combinaison(CombinaisonKind.COLOR, cardsColor);
 		}
 		return null;
@@ -195,14 +221,18 @@ public class Hand {
 	
 	private Combinaison getCombinaisonForQuinte(){
 		ArrayList<Card> cardsQuinte = new ArrayList<Card>();
-		for (int i = COUNT_LINE_STAT; i >= 0; i--){
-			if (statsCards[COUNT_COLUMN_STAT][i] > 0){
-				cardsQuinte.add(getCardsByLine(i).get(0));
+		for (int i = COUNT_COLUMN_STAT; i >= 0; i--){
+			if (statsCards[COUNT_LINE_STAT][i] > 0){
+				List<Card> cardsByColumn = getCardsByColumn(i);				
+				if (!cardsByColumn.isEmpty()){
+					cardsQuinte.add(cardsByColumn.get(0));
+				}
 			} else {
 				cardsQuinte.clear();
 			}
 		}
 		if (cardsQuinte.size() == 5){
+			this.log("	QUINTE trouvée");
 			return new Combinaison(CombinaisonKind.QUINTE, cardsQuinte);
 		}
 		return null;
@@ -218,19 +248,22 @@ public class Hand {
 		if (bestCard != null){
 			ArrayList<Card> hightCard = new ArrayList<Card>();
 			hightCard.add(bestCard);
+			this.log("	Meilleure carte trouvée => " + bestCard);
+			this.log("Liste des hightCard => " + hightCard);
 			return new Combinaison(CombinaisonKind.HIGHT_CARD, hightCard);
 		}
 		return null;
 	}
 	
 	public void calculateCombinaisons() {
+		this.log("	Mise à jour des combinaisons....");
 		Combinaison quinte = getCombinaisonForQuinte();
 		Combinaison color = getCombinaisonForColor();
 		Combinaison currentCombinaison = null;
 		
 		if (quinte != null && color != null){							// si l'on a une couleur et une quinte, on doit déterminer si ce sont les mêmes cartes
 			Combinaison quinteFlush = quinte;
-			quinteFlush.getCards().retainAll(color.getCards());			// on calcule l'intersection entre les cartes de la couleur et celles de la quinte
+			quinteFlush.getCards().retainAll(color.getCards());			// on calcule l'intersection entre les cartes de la couleur et celles de la quinte			
 			if (quinteFlush.getCards().size() == 5){					// Si on a rien supprimé, on a une quinte flush
 				if (quinteFlush.getBestCard().getValue() == ValueCard.AS){		// si la meilleure carte de la quinte flush est un AS, alors c'est une quinte flush royale
 					currentCombinaison =  new Combinaison(CombinaisonKind.QUINTE_FLUSH_ROYAL, quinteFlush.getCards());
@@ -245,7 +278,7 @@ public class Hand {
 			if (carre != null){
 				currentCombinaison = carre;
 			} else {
-				Combinaison full = getCombinaisonForCFull();
+				Combinaison full = getCombinaisonForFull();
 				if (full != null){
 					currentCombinaison = full;
 				} else {
@@ -266,6 +299,12 @@ public class Hand {
 									Combinaison paire = getCombinaisonForPaire(-1);
 									if (paire != null) {
 										currentCombinaison = paire;
+									} else {
+										Combinaison hightestCard = getHightestCard();
+										if (hightestCard != null) {
+											currentCombinaison = hightestCard;
+											this.log("Mise à jour de la combinaison courante : " + currentCombinaison);
+										}
 									}
 								}
 							}
@@ -275,8 +314,13 @@ public class Hand {
 			}
 		}
 		
+		this.log("	Vérification de la meilleure combinaison....");
+		//this.log(currentCombinaison.getKind() + " est meilleure que " + bestCombinaison.getKind() + "?");
 		if (currentCombinaison.isStrongerThan(bestCombinaison)){
+			this.log("Mise à jour de la meilleure combinaison");
 			bestCombinaison = currentCombinaison;
+		} else {
+			this.log(currentCombinaison.getKind() + " n'est pas meilleure que " + bestCombinaison);
 		}
 	}
 	
@@ -286,21 +330,19 @@ public class Hand {
 	
 	public void setCoinsVariation(int variation){
 		// permettra de déterminer si c'est une main gagnante (variation positive) ou perdante (variation négative)
+		this.log("Mise à jour de la variation des jetons...");
 		coinsVariation = variation;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Hand [Nombre de cartes = ");
-		builder.append(cards.size());
-		builder.append("/" + Constantes.NB_MAX_CARDS+ " , \nCartes = ");
-		builder.append(cards);
-		builder.append(",\nMeilleure combinaison = ");
-		builder.append(bestCombinaison);
-		builder.append(",\n Variation des jetons = ");
-		builder.append(coinsVariation);
-		builder.append("\n]");
+		builder.append("-------------- Main n°" + indexHand + " ---------\n");
+		builder.append("Nombre de carte : " + cards.size() + "\n");
+		builder.append("Meilleure combinaison : " + bestCombinaison + "\n");
+		builder.append("Variation du nombre de jetons  : " + coinsVariation + "\n");
+		builder.append("-------------- /Main ---------\n");
+				
 		return builder.toString();
 	}
 }

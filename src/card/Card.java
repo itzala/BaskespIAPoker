@@ -92,7 +92,10 @@ public class Card implements Comparable<Card>{
 	
 	public boolean isStrongerThan(Card c)
 	{
-		return c != null && compareTo(c) == 1;
+		if (c == null){
+			return true;
+		}
+		return compareTo(c) == 1;
 	}
 	
 	public boolean isWeakerThan(Card c)
@@ -142,9 +145,4 @@ public class Card implements Comparable<Card>{
 			}
 		}
 	};
-
-
-	public boolean isValid() {
-		return false;
-	}
 }

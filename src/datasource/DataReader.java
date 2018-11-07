@@ -51,10 +51,7 @@ public class DataReader {
 		Player current_player = parser.fromJson(message.getRawData(Message.DATA_KEY_INFO_PLAYER).toString(), Player.class);
 		if (current_player == null){
 			System.out.println("[WARNING] Pas de joueur accessible !");
-		}else{
-			System.out.println("Player reçu !");
-		}
-		
+		}		
 		return current_player;
 	}
 
