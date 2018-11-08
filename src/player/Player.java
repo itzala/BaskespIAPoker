@@ -1,12 +1,15 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.annotations.SerializedName;
 
 import card.Card;
+import card.Combinaison;
 import card.CombinaisonKind;
 import card.Hand;
+import constantes.Constantes;
 import game.Game;
 import player.ActionPlayer;
 import player.StatePlayer;
@@ -14,25 +17,25 @@ import player.StatePlayer;
 public class Player implements Comparable<Player>{
 	private int id;
 	private String name;
-	private @SerializedName("chips") int nb_coins;
-	private ActionPlayer current_action;
+	private @SerializedName("chips") int nbCoins;
+	private ActionPlayer currentAction;
 	private StatePlayer state;
 	private boolean dealer;
 	private ArrayList<Hand> hands;
-	private Hand current_hand;
+	private Hand currentHand;
 	private ArrayList<ActionPlayer> actions;
-	private int nb_coins_begin_hand = 0;
-	private int small_blind = 0;
-	private int big_blind = 0;
+	private int nbCoinsBeginHand = 0;
+	private int smallBlind = 0;
+	private int bigBlind = 0;
 	
 	public Player(Player model)
 	{
 		this(model.getId(), model.getName(), model.getNbCoins(), model.getState());
 	}
 	
-	public Player(int id_player, String name, int coins, StatePlayer state_player)
+	public Player(int idPlayer, String name, int coins, StatePlayer statePlayer)
 	{
-		this(id_player, name, coins, state_player, false);
+		this(idPlayer, name, coins, statePlayer, false);
 	}
 	
 	public Player(int id_player, String name, int coins, StatePlayer state_player, boolean isDealer)
@@ -42,9 +45,9 @@ public class Player implements Comparable<Player>{
 		this.state = state_player;
 		this.dealer = isDealer;
 		if (coins < 0)
-			this.nb_coins = 0;
+			this.nbCoins = 0;
 		else
-			this.nb_coins = coins;
+			this.nbCoins = coins;
 		
 		this.initialize();
 	}
@@ -64,17 +67,11 @@ public class Player implements Comparable<Player>{
 		System.out.println("[ Player ] " + message);
 	}
 	
-	
-	private void debug(String message)
-	{
-		this.log("[DEBUG] " + message);
-	}
-	
 	private void initialize()
 	{
 		this.log("Initialisation du joueur '" + this.name  + "'");
-		current_action = null;
-		current_hand = null;
+		currentAction = null;
+		currentHand = null;
 		hands = new ArrayList<Hand>();
 		actions = new ArrayList<ActionPlayer>();
 	}
@@ -84,42 +81,84 @@ public class Player implements Comparable<Player>{
 		return this.id;
 	}
 	
-	private int getPowerOfHand(int nb_hand, int last_bet)
-	{
-		this.debug("nb_hand =" + nb_hand + ", last_bet = " + last_bet);
-		int ratio_hands = Math.round((nb_hand / Game.NB_MAX_HANDS) * 100);
-		int ratio_bet = Math.round((last_bet / this.nb_coins) * 100);
-		int rank_combinaison = this.current_hand.getBestCombinaison().getPowerfull();
-		this.debug("ratio_hands =" + ratio_hands + ", ratio_bet = " + ratio_bet + ", rank_combinaison = " + rank_combinaison );		
-		return (int) Math.min(Math.round((ratio_hands + ratio_bet + rank_combinaison) * 0.75), nb_coins);
-	}
-	
 	public void updateBlindAmount(int small, int big)
 	{
-		small_blind = small;
-		big_blind = big;
+		smallBlind = small;
+		bigBlind = big;
 	}
-		
-	public ActionPlayer doAction(int nb_hand, int last_bet)
+	
+	private Combinaison getBestCombinaison()
 	{
-		double power = 1.5; //getPowerOfHand(nb_hand, last_bet);
+		return currentHand.getBestCombinaison();
+	}
+	
+	private int getNbConnectedCards()
+	{
+		Card bestCard = getBestCombinaison().getBestCard();
+		Card weakestCard = getBestCombinaison().getWeakestCard();
+		
+		/*if (bestCard.getIntValue() - weakestCard.getIntValue() < 3){
+			return 2;
+		}
+		
+		if (bestCard.getIntValue() - weakestCard.getIntValue() < 5){
+			return 1;
+		}*/
+		return 0;
+		
+	}
+	
+	private int getNbSuitedCards()
+	{
+		return currentHand.getNbSuitedCards();
+	}
+	
+	public ActionPlayer doAction(HashMap<String, Object> infos)
+	{
+	
+		int lastBet = (int) infos.get(Constantes.INFO_LAST_BET);
+		int nbHand = (int) infos.get(Constantes.INFO_NB_HAND);
+		int nbRivals = (int) infos.get(Constantes.INFO_NB_RIVALS);
+		
+		double power = 1.5;
+		int nextBet = lastBet;
+		Combinaison bestCombinaison = getBestCombinaison();
+		if (bestCombinaison != null){
+			int strength = bestCombinaison.getPowerfull();
+			int quality = getNbConnectedCards() + getNbSuitedCards();
+			int mIndicator = nbCoins / (bigBlind + smallBlind);
+			
+			if (mIndicator >= 10 && mIndicator <= 20){
+				nextBet = lastBet + bigBlind;
+			} else if (mIndicator >= 5){
+				nextBet = lastBet + bigBlind;
+			} else if (mIndicator >= 0){
+				nextBet = nbCoins;
+			}
+		}
+		
+		currentAction = new ActionPlayer(nextBet, lastBet, smallBlind, bigBlind);
+		
+		
+		
+		
+		/*double power = 1.5; //getPowerOfHand(nb_hand, last_bet);
 		System.out.println("Power of Hand : " + power + " et last_bet : " + last_bet);
 		int next_bet = (int) Math.min(last_bet * power, nb_coins);
 		if (next_bet == nb_coins)
 			this.setState(StatePlayer.ALL_IN);
 		current_action = new ActionPlayer(next_bet, last_bet, small_blind, big_blind);
-		this.log("L'ia choisie de faire : " + current_action);
+		this.log("L'ia choisie de faire : " + current_action);*/
 			
-		return current_action;
+		return currentAction;
 	}
 	
 	public void validateAction()
 	{
-		if (current_action != null)
-		{
-			this.nb_coins -= this.current_action.getValue();
-			actions.add(current_action);
-			current_action = null;
+		if (currentAction != null) {
+			this.nbCoins -= this.currentAction.getValue();
+			actions.add(currentAction);
+			currentAction = null;
 		}
 		else
 		{
@@ -129,13 +168,13 @@ public class Player implements Comparable<Player>{
 	
 	public void updateCoinsAfterAction(ActionPlayer action)
 	{
-		this.current_action = action;
+		this.currentAction = action;
 		this.validateAction();
 	}
 	
 	public void addNewCard(Card c)
 	{
-		current_hand.addCard(c);
+		currentHand.addCard(c);
 	}
 	
 	public Player addCards(ArrayList<Card> list_card)
@@ -163,16 +202,16 @@ public class Player implements Comparable<Player>{
 	
 	public int getNbCoins()
 	{
-		return this.nb_coins;
+		return this.nbCoins;
 	}
 	
 	public void startNewHand(int index_hand)
 	{
 		if (index_hand > 1){
-			hands.add(current_hand);
+			hands.add(currentHand);
 		}
-		current_hand = new Hand(index_hand);
-		this.nb_coins_begin_hand = this.nb_coins;
+		currentHand = new Hand(index_hand);
+		this.nbCoinsBeginHand = this.nbCoins;
 	}
 	
 	public boolean isSameThan(Player other)
@@ -180,14 +219,14 @@ public class Player implements Comparable<Player>{
 		return this.compareTo(other) == 0;
 	}
 	
-	public void uptdateVariationCoinsEndHand(int nb_coins_end_hand)
+	public void uptdateVariationCoinsEndHand(int nbCoinsEndHand)
 	{
-		current_hand.setCoinsVariation(nb_coins_end_hand - nb_coins_begin_hand);
+		currentHand.setCoinsVariation(nbCoinsEndHand - nbCoinsBeginHand);
 	}
 	
 	public Hand getHand() {
 		
-		return current_hand;
+		return currentHand;
 	}
 
 	@Override
@@ -198,9 +237,9 @@ public class Player implements Comparable<Player>{
 		builder.append(", name=");
 		builder.append(name);
 		builder.append(", nb_coins=");
-		builder.append(nb_coins);
+		builder.append(nbCoins);
 		builder.append(", current_action=");
-		builder.append(current_action);
+		builder.append(currentAction);
 		builder.append(", state=");
 		builder.append(state);
 		builder.append(", dealer=");
@@ -211,8 +250,9 @@ public class Player implements Comparable<Player>{
 
 	@Override
 	public int compareTo(Player other) {
-		if (this.id == other.id && this.name.equals(other.name))
+		if (this.id == other.id && this.name.equals(other.name)){
 			return 0;
+		}
 		return 1;
 	}
 
@@ -224,7 +264,7 @@ public class Player implements Comparable<Player>{
 	public void updateInfoFrom(Player other) {
 		this.state = other.state;
 		this.dealer = other.dealer;
-		this.nb_coins = other.nb_coins;
+		this.nbCoins = other.nbCoins;
 		
 	}
 }

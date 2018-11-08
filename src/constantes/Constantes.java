@@ -14,4 +14,11 @@ public interface Constantes {
 	public final int TIME_BEFORE_TIMEOUT 	= 15;	// temps en secondes
 	
 	public final int NB_MAX_CARDS			= 7;
+	
+	public final String INFO_NB_HAND 		= "info.nb_hand";
+	public final String INFO_NB_RIVALS 		= "info.nb_rivals";
+	public final String INFO_STATE_GAME		= "info.state_game";
+	public final String INFO_LAST_BET		= "info.last_bet";
+	public final String INFO_SMALL_BLIND	= "info.small_blind";
+	public final String INFO_BIG_BLIND		= "info.big_blind";
 }

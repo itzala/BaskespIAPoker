@@ -87,7 +87,11 @@ public class Card implements Comparable<Card>{
 
 	public boolean isSameValueThan(Card c)
 	{
-		return c != null && compareTo(c) == 0;
+		
+		if (c == null){
+			return false;
+		}
+		return compareTo(c) == 0;
 	}
 	
 	public boolean isStrongerThan(Card c)
@@ -100,7 +104,10 @@ public class Card implements Comparable<Card>{
 	
 	public boolean isWeakerThan(Card c)
 	{
-		return c != null && compareTo(c) == -1;
+		if (c == null){
+			return false;
+		}
+		return compareTo(c) == -1;
 	}
 			
 	@Override

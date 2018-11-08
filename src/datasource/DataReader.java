@@ -96,4 +96,9 @@ public class DataReader {
 		
 		return blinds;
 	}
+
+	public String getReasonOfFailurePlay() {
+		String reason = parser.fromJson(message.getRawData(Message.DATA_KEY_REASON).toString(), String.class);
+		return reason;
+	}
 }

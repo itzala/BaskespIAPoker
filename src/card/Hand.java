@@ -89,6 +89,18 @@ public class Hand {
 		}
 	}
 	
+	public int getNbSuitedCards()
+	{
+		int nbSuitedCards = 0;
+		for (int i = COUNT_COLUMN_STAT; i >= 0; i--){
+			if (statsCards[COUNT_LINE_STAT][i] > 0){
+				nbSuitedCards  = statsCards[COUNT_LINE_STAT][i];
+				break;
+			}
+		}
+		return nbSuitedCards ;
+	}
+	
 	private int getIndexOfFirstCount(int countSearched, boolean inValue, int excludedCount)
 	{
 		int index = -1;
@@ -320,7 +332,7 @@ public class Hand {
 			this.log("Mise à jour de la meilleure combinaison");
 			bestCombinaison = currentCombinaison;
 		} else {
-			this.log(currentCombinaison.getKind() + " n'est pas meilleure que " + bestCombinaison);
+			this.log(currentCombinaison + " n'est pas meilleure que " + bestCombinaison);
 		}
 	}
 	
@@ -344,5 +356,10 @@ public class Hand {
 		builder.append("-------------- /Main ---------\n");
 				
 		return builder.toString();
+	}
+
+	public int getNbCards() {
+		return cards.size();
+		
 	}
 }

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 public class Combinaison implements Comparable<Combinaison>{
 	private CombinaisonKind kind;
 	private ArrayList<Card> cards;
-	private Combinaison subcombinaison1;
-	private Combinaison subcombinaison2;
+	private Combinaison subCombinaison1;
+	private Combinaison subCombinaison2;
+	private Card bestCard;
 		
 	public Combinaison(CombinaisonKind kind)
 	{
@@ -21,10 +22,12 @@ public class Combinaison implements Comparable<Combinaison>{
 				cards = new ArrayList<Card>();
 			cards.addAll(c);
 		}
-		else
+		else {
 			cards = c;
-		subcombinaison1 = null;
-		subcombinaison2 = null;
+		}
+		subCombinaison1 = null;
+		subCombinaison2 = null;
+		bestCard = getBestCard();
 	}
 	
 	public Combinaison(CombinaisonKind kind, Combinaison c1, Combinaison c2)
@@ -32,18 +35,18 @@ public class Combinaison implements Comparable<Combinaison>{
 		if (c1 != null && c2 != null)
 		{
 			this.kind = kind;
-			subcombinaison1 = c1;
-			subcombinaison2 = c2;
+			subCombinaison1 = c1;
+			subCombinaison2 = c2;
 			cards = null;
 		}
 	}
 	
 	public int getPowerfull()
 	{
-		if (subcombinaison1 != null && subcombinaison2 != null)
-			return (subcombinaison1.getPowerfull() + subcombinaison2.getPowerfull());
+		if (subCombinaison1 != null && subCombinaison2 != null)
+			return (subCombinaison1.getPowerfull() + subCombinaison2.getPowerfull());
 		else
-			return this.kind.ordinal() * (int) cards.stream().mapToInt(a -> a.getIntValue()).sum();
+			return this.kind.ordinal() * bestCard.getIntValue();
 	}
 	
 	public CombinaisonKind getKind()
@@ -55,20 +58,39 @@ public class Combinaison implements Comparable<Combinaison>{
 	{
 		if (cards != null) // combinaison "atomique" telle que le carre, le brelan, la paire, etc...
 		{
-			Card best_card = null;
-			//Card best_card = null;
+			Card bestCard = null;
 			for (Card card : cards) {
-				if (card.isStrongerThan(best_card))
-					best_card = card;
+				if (card.isStrongerThan(bestCard))
+					bestCard = card;
 			}
-			return best_card;
+			return bestCard;
 		}
 		else // combinaison composée : full ou double paire
 		{
-			if (subcombinaison1.isStrongerThan(subcombinaison2))
-				return subcombinaison1.getBestCard();
+			if (subCombinaison1.isStrongerThan(subCombinaison2))
+				return subCombinaison1.getBestCard();
 			else
-				return subcombinaison2.getBestCard();
+				return subCombinaison2.getBestCard();
+		}
+	}
+	
+	public Card getWeakestCard()
+	{
+		if (cards != null) // combinaison "atomique" telle que le carre, le brelan, la paire, etc...
+		{
+			Card weakestCard = null;
+			for (Card card : cards) {
+				if (card.isWeakerThan(bestCard))
+					weakestCard = card;
+			}
+			return weakestCard;
+		}
+		else // combinaison composée : full ou double paire
+		{
+			if (subCombinaison1.isStrongerThan(subCombinaison2))
+				return subCombinaison1.getWeakestCard();
+			else
+				return subCombinaison2.getWeakestCard();
 		}
 	}
 	
@@ -91,21 +113,26 @@ public class Combinaison implements Comparable<Combinaison>{
 			return cards;
 		else
 		{
-			ArrayList<Card> sub_cards = subcombinaison1.getCards(); 
-			sub_cards.addAll(subcombinaison2.getCards());
-			return sub_cards;
+			ArrayList<Card> subCards = subCombinaison1.getCards(); 
+			subCards.addAll(subCombinaison2.getCards());
+			return subCards;
 		}
 			
 	}
 
 	@Override
 	public int compareTo(Combinaison c) {
-		boolean stronger_kind = kind.ordinal() > c.kind.ordinal();
-		if (!stronger_kind)
-		{
-			Card best_card = getBestCard();
-			Card other_best_card = c.getBestCard();
-			return best_card.compareTo(other_best_card);
+		boolean strongerKind = kind.ordinal() > c.kind.ordinal();
+		if (!strongerKind) {
+			Card bestCard = getBestCard();
+			if (bestCard == null){
+				return -1;
+			}
+			Card otherBestCard = c.getBestCard();
+			if (otherBestCard == null){
+				return 1;
+			}
+			return bestCard.compareTo(otherBestCard);
 		}
 		return 1;
 	}
@@ -115,8 +142,7 @@ public class Combinaison implements Comparable<Combinaison>{
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
 		builder.append(kind);
-		if (subcombinaison1 == null && subcombinaison2 == null)
-		{
+		if (subCombinaison1 == null && subCombinaison2 == null) {
 			builder.append(", Cartes = ");
 			for (Card card : cards) {
 				builder.append(card);
@@ -126,9 +152,9 @@ public class Combinaison implements Comparable<Combinaison>{
 		else
 		{
 			builder.append(", Composee de ");
-			builder.append(subcombinaison1);
+			builder.append(subCombinaison1);
 			builder.append("\n et de ");
-			builder.append(subcombinaison2);
+			builder.append(subCombinaison2);
 		}
 		
 		builder.append("]");

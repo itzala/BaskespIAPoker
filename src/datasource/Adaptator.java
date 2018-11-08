@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +35,15 @@ public class Adaptator {
 	private PrintWriter writer;
 	private InputStream streamFromSocket;
 	private Gson gson;
+	private boolean isAlive;
 	
 	public Adaptator(Game game)
 	{
 		this.game = game;
 		GsonBuilder builder = new GsonBuilder();
-		//builder.setLenient();
 		gson = builder.create();
+		
+		isAlive = true;
 	}
 	
 	public void connect()
@@ -51,6 +55,9 @@ public class Adaptator {
 			writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
 			JsonElement dataMessage = new JsonPrimitive(Constantes.PLAYER_NAME);
 			this.sendResponse(Message.ID_MESSAGE_JOIN_LOBBY, dataMessage);
+		} catch (ConnectException e2){
+			this.log("[ ERROR ] Connexion au serveur impossible... Arrêt du programme");
+			isAlive = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,9 +113,7 @@ public class Adaptator {
 	public void listen(){
 		if (streamFromSocket != null){
 			try {
-				boolean disconnect = false;
-				
-				while(!disconnect){
+				while(isAlive){
 					String receivedData = readDataFrom(streamFromSocket);
 					if (!receivedData.isEmpty()){
 						List<Message> receivedMessages = parseReceivedData(receivedData);
@@ -130,7 +135,7 @@ public class Adaptator {
 									Player winner = dataReader.getFinalWinner();
 									game.setStateGame(StateGame.GAME_FINISH);
 									game.checkWinner(winner);
-									disconnect = true;
+									isAlive = false;
 									break;
 								case Message.ID_MESSAGE_GAME_CARDS :
 									this.log("Nouvelles cartes pour le joueur");
@@ -151,20 +156,25 @@ public class Adaptator {
 									this.log("Echec lors de la connexion au lobby. Raison évoquée : " + dataReader.getReasonOfFailJoinLobby());
 									break;
 								case Message.ID_MESSAGE_PLAY :
-									ActionPlayer action = game.doAction();
+									ActionPlayer action = game.doAction(-1);
 									this.log("A vous de jouer !");
-									if (game.isLocalValidAction()){
-										JsonElement dataMessage = new JsonPrimitive(action.getValue());
-										this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
-									}
+									JsonElement dataMessage = new JsonPrimitive(action.getValue());
+									this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
 									break;
 								case Message.ID_MESSAGE_FAILURE :
-									this.log("Coup invalide... Retentez votre coup");
-									ActionPlayer actionRetry = game.doAction();									
-									if (game.isLocalValidAction()){
-										JsonElement dataMessage = new JsonPrimitive(actionRetry.getValue());
-										this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessage);
+									String reason = dataReader.getReasonOfFailurePlay();
+									this.log("Coup invalide... " + reason + " Retentez votre coup");
+									Pattern errorMessagePattern = Pattern.compile("value less than currentBet : ([0-9]+) vs ([0-9]+)");
+									Matcher matcher = errorMessagePattern.matcher(reason);
+									
+									int minBet = -1;
+									
+									if (matcher.find()){
+										minBet = Integer.parseInt(matcher.group(2));
 									}
+									ActionPlayer actionRetry = game.doAction(minBet);									
+									JsonElement dataMessageRetry = new JsonPrimitive(actionRetry.getValue());
+									this.sendResponse(Message.ID_MESSAGE_CLIENT_ACTION, dataMessageRetry);
 									break;
 								case Message.ID_MESSAGE_SUCCESS :
 									this.log("Coup valide pris en compte !");
@@ -205,6 +215,11 @@ public class Adaptator {
 						}
 					}
 				}
+			}catch (SocketException e2) {
+				isAlive = false;
+				this.log(" [ERROR] Perte de la connexion au serveur....");
+			} catch (IOException e2) {
+				isAlive = false;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -232,7 +247,9 @@ public class Adaptator {
 	public void release(){
 		try {
 			this.log("Fermeture des flux.... avant arrêt du client");
-			clientSocket.close();
+			if (clientSocket != null){
+				clientSocket.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
